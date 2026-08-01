@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
+import { DIFFICULTY_CONFIG } from '@/features/guess-flag-game/constants/guessFlagGame.constants';
+import type { GuessFlagDifficulty } from '@/features/guess-flag-game/types';
 
 type GuessFlagGameHudProps = {
+  readonly difficulty: GuessFlagDifficulty;
   readonly currentRound: number;
   readonly totalRounds: number;
   readonly score: number;
@@ -10,18 +13,25 @@ type GuessFlagGameHudProps = {
 };
 
 export function GuessFlagGameHud({
+  difficulty,
   currentRound,
   totalRounds,
   score,
   correctAnswers,
   streak,
 }: GuessFlagGameHudProps) {
+  const difficultyConfig = DIFFICULTY_CONFIG[difficulty];
+
   return (
     <View
       style={styles.container}
       accessible
-      accessibilityLabel={`Rodada ${currentRound} de ${totalRounds}. ${score} pontos. ${correctAnswers} acertos. Sequência de ${streak}.`}
+      accessibilityLabel={`${difficultyConfig.label}, multiplicador ${difficultyConfig.multiplierLabel}. Rodada ${currentRound} de ${totalRounds}. ${score} pontos. ${correctAnswers} acertos. Sequência de ${streak}.`}
     >
+      <View style={styles.difficultyRow}>
+        <Text style={styles.difficulty}>{difficultyConfig.label}</Text>
+        <Text style={styles.multiplier}>{difficultyConfig.multiplierLabel} pontos</Text>
+      </View>
       <View style={styles.row}>
         <Text style={styles.primaryMetric}>
           Rodada {currentRound}/{totalRounds}
@@ -50,6 +60,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  difficultyRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: spacing.sm,
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+  },
+  difficulty: {
+    color: colors.primary,
+    fontSize: fontSizes.sm,
+    fontWeight: '800',
+  },
+  multiplier: {
+    color: colors.textSecondary,
+    fontSize: fontSizes.sm,
+    fontWeight: '700',
   },
   primaryMetric: {
     color: colors.textPrimary,

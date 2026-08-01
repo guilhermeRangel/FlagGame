@@ -2,14 +2,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { AppButton } from '@/shared/components/AppButton';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
+import { DIFFICULTY_CONFIG } from '@/features/guess-flag-game/constants/guessFlagGame.constants';
+import type { GuessFlagDifficulty } from '@/features/guess-flag-game/types';
 import { getPerformanceMessage } from '@/features/guess-flag-game/utils/guessFlagGameRules';
 
 type GuessFlagGameResultProps = {
+  readonly difficulty: GuessFlagDifficulty;
   readonly score: number;
   readonly correctAnswers: number;
   readonly incorrectAnswers: number;
   readonly bestStreak: number;
   readonly onRestart: () => void;
+  readonly onChangeDifficulty: () => void;
   readonly onBack: () => void;
 };
 
@@ -28,18 +32,29 @@ function ResultMetric({ label, value }: ResultMetricProps) {
 }
 
 export function GuessFlagGameResult({
+  difficulty,
   score,
   correctAnswers,
   incorrectAnswers,
   bestStreak,
   onRestart,
+  onChangeDifficulty,
   onBack,
 }: GuessFlagGameResultProps) {
+  const difficultyConfig = DIFFICULTY_CONFIG[difficulty];
+
   return (
     <Animated.View entering={FadeInUp.duration(320)} style={styles.container}>
       <Text style={styles.celebration}>★</Text>
       <Text style={styles.title}>Partida concluída!</Text>
       <Text style={styles.message}>{getPerformanceMessage(correctAnswers)}</Text>
+
+      <View style={styles.difficultyBadge} accessible>
+        <Text style={styles.difficultyLabel}>{difficultyConfig.label}</Text>
+        <Text style={styles.difficultyMultiplier}>
+          Multiplicador {difficultyConfig.multiplierLabel}
+        </Text>
+      </View>
 
       <View style={styles.scoreCard} accessible>
         <Text style={styles.scoreLabel}>Pontuação final</Text>
@@ -54,6 +69,7 @@ export function GuessFlagGameResult({
 
       <View style={styles.actions}>
         <AppButton title="Jogar novamente" onPress={onRestart} />
+        <AppButton title="Trocar dificuldade" variant="secondary" onPress={onChangeDifficulty} />
         <AppButton title="Voltar aos jogos" variant="secondary" onPress={onBack} />
       </View>
     </Animated.View>
@@ -84,6 +100,27 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'center',
     marginBottom: spacing.lg,
+  },
+  difficultyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderColor: colors.primary,
+    borderWidth: 1,
+    borderRadius: borderRadius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  difficultyLabel: {
+    color: colors.primary,
+    fontSize: fontSizes.sm,
+    fontWeight: '800',
+  },
+  difficultyMultiplier: {
+    color: colors.textSecondary,
+    fontSize: fontSizes.sm,
   },
   scoreCard: {
     width: '100%',

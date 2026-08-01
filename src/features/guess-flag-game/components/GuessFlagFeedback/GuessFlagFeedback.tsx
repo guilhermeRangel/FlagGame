@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect } from 'react';
+import { AccessibilityInfo, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInLeft, ZoomIn } from 'react-native-reanimated';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
+import { DIFFICULTY_CONFIG } from '@/features/guess-flag-game/constants/guessFlagGame.constants';
 import type { GuessFlagAnswerFeedback } from '@/features/guess-flag-game/types';
 
 type GuessFlagFeedbackProps = {
@@ -8,20 +10,27 @@ type GuessFlagFeedbackProps = {
 };
 
 export function GuessFlagFeedback({ feedback }: GuessFlagFeedbackProps) {
+  const difficultyConfig = DIFFICULTY_CONFIG[feedback.difficulty];
+  const multiplierLabel = `×${String(feedback.multiplier).replace('.', ',')}`;
   const backgroundColor = feedback.isCorrect ? colors.successSurface : colors.dangerSurface;
   const borderColor = feedback.isCorrect ? colors.success : colors.danger;
   const title = feedback.isCorrect ? 'Parabéns! Resposta correta.' : 'Resposta incorreta.';
   const detail = feedback.isCorrect
     ? `+${feedback.pointsAwarded} pontos`
     : `A resposta correta era ${feedback.correctCountryName}.`;
+  const difficultyDetail = `${difficultyConfig.label} · ${multiplierLabel} pontos`;
+  const accessibilityAnnouncement = `${title} ${detail} Nível ${difficultyDetail}.`;
+
+  useEffect(() => {
+    AccessibilityInfo.announceForAccessibility(accessibilityAnnouncement);
+  }, [accessibilityAnnouncement]);
 
   return (
     <Animated.View
       entering={feedback.isCorrect ? ZoomIn.duration(220) : FadeInLeft.duration(220)}
       style={[styles.container, { backgroundColor, borderColor }]}
       accessible
-      accessibilityLiveRegion="polite"
-      accessibilityLabel={`${title} ${detail}`}
+      accessibilityLabel={accessibilityAnnouncement}
     >
       <View style={[styles.icon, { borderColor }]}>
         <Text style={[styles.iconText, { color: borderColor }]}>
@@ -31,6 +40,7 @@ export function GuessFlagFeedback({ feedback }: GuessFlagFeedbackProps) {
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.detail}>{detail}</Text>
+        <Text style={styles.difficulty}>{difficultyDetail}</Text>
       </View>
     </Animated.View>
   );
@@ -70,5 +80,10 @@ const styles = StyleSheet.create({
   detail: {
     color: colors.textSecondary,
     fontSize: fontSizes.sm,
+  },
+  difficulty: {
+    color: colors.textPrimary,
+    fontSize: fontSizes.xs,
+    fontWeight: '700',
   },
 });

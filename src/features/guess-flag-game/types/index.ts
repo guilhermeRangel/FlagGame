@@ -1,5 +1,6 @@
 export type {
   GuessFlagAnswerFeedback,
+  GuessFlagDifficulty,
   GuessFlagGameState,
   GuessFlagGameStatus,
   GuessFlagOption,
