@@ -18,7 +18,7 @@ Este documento existe para que o próximo modelo entenda rapidamente o estado at
 - Orientação por tela: Welcome e Information ficam livres (padrão do sistema); Game Selection e Flag Game são travadas em `PORTRAIT` (não mais `LANDSCAPE`).
 - Tela de seleção de jogos implementada com `FlatList` (`flex: 1` explícito) rolável, 10 opções (1 disponível, 9 "em breve").
 - Tela Welcome com tema musical local em loop, controlado pelo botão Música/Silencioso com `expo-audio`.
-- Tela de jogo principal com grade de 4 colunas por linha e 30 bandeiras sorteadas por rodada, dentro de um `ScrollView`.
+- Tela de jogo principal com grade de 3 colunas por linha e 30 bandeiras sorteadas por rodada, dentro de um `ScrollView`.
 - O catálogo contém as 262 bandeiras RGI de países/regiões e subdivisões disponíveis no Unicode Emoji 17.0: 259 regionais mais Inglaterra, Escócia e País de Gales.
 - Cada card aceita quatro interações; ao atingir o limite ele é desabilitado, recebe aparência esgotada e deixa de atualizar o estado.
 - Information, Game Selection e Flag Game usam 32 px de padding horizontal pelo token `spacing.xl`; o `ScreenContainer` mantém 24 px como padrão para as demais telas.
@@ -52,7 +52,7 @@ Este documento existe para que o próximo modelo entenda rapidamente o estado at
 - Corrigido bug de navegação: `WelcomeScreen` chamava `navigation.replace(ROUTES.GAME_SELECTION)`, removendo a Welcome da pilha e quebrando o botão voltar em Game Selection. Trocado para `navigation.navigate(...)`.
 - Trocada a orientação de `GameSelectionScreen` e `FlagGameScreen` de `LANDSCAPE` para `PORTRAIT`.
 - `GameSelectionScreen`: adicionado `style={{ flex: 1 }}` ao `FlatList` para garantir rolagem confiável em qualquer orientação.
-- `FlagGameScreen`: lista horizontal (`FlatList`) trocada por `ScrollView` com grade `flexWrap`; atualmente são 4 colunas por linha para melhorar a leitura dos países.
+- `FlagGameScreen`: lista horizontal (`FlatList`) trocada por `ScrollView` com grade `flexWrap`; atualmente são 3 colunas por linha, com cards mais largos para melhorar a leitura dos países.
 - `flags.data.ts`: expandido de 10 para 30 países; `getRandomFlags` corrigido para embaralhar mesmo quando a quantidade pedida é igual ao total (antes retornava a ordem original sem embaralhar).
 - `InteractiveFlagCard`: redimensionado para caber em colunas estreitas (largura percentual, fontes menores, `numberOfLines`/`ellipsizeMode` para evitar overflow).
 
@@ -67,7 +67,7 @@ Este documento existe para que o próximo modelo entenda rapidamente o estado at
 
 ## Armadilhas conhecidas (aprendidas durante a validação)
 
-- **Larguras percentuais em grade com `flexWrap`**: evite usar exatamente `25%` em quatro colunas, pois o arredondamento do Yoga pode derrubar o último card para outra linha. A grade usa `width: '23%'` com `justifyContent: 'space-between'`.
+- **Larguras percentuais em grade com `flexWrap`**: evite usar exatamente `33.33%` em três colunas, pois o arredondamento do Yoga pode derrubar o último card para outra linha. A grade usa `width: '31%'` com `justifyContent: 'space-between'`.
 - **`adb shell monkey -p <pkg> -c android.intent.category.LAUNCHER 1`** não é um "relaunch limpo": o argumento numérico injeta esse tanto de eventos de toque aleatórios após abrir o app. Para reabrir sem efeitos colaterais, use `adb shell am start -n <pkg>/<activity>` (ou `force-stop` + `am start`).
 - **Restauração de estado de navegação**: forçar reabertura via deep link (`am start -a VIEW -d exp://...`) pode restaurar a última tela aberta (não a Splash), e remontar telas anteriores da pilha ao mesmo tempo — isso pode causar corrida entre travamentos de orientação de telas diferentes. Para testar orientação de forma confiável, prefira navegar manualmente (tela a tela) a partir de um estado limpo (`pm clear` ou `force-stop`) em vez de confiar em deep link direto após uso prévio do app.
 

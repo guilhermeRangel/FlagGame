@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   gridItem: {
-    width: '23%',
+    width: '31%',
     marginBottom: spacing.md,
   },
 });

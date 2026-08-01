@@ -27,10 +27,10 @@ export function InteractiveFlagCard({ flag, speed, onPress }: InteractiveFlagCar
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
-  let label = '4 giros restantes';
+  let label = '4';
   if (speed > 0 && speed < 4) {
     const remainingSpins = 4 - speed;
-    label = `${remainingSpins} giro${remainingSpins === 1 ? '' : 's'} restante${remainingSpins === 1 ? '' : 's'}`;
+    label = `${remainingSpins} giro${remainingSpins === 1 ? '' : 's'}${remainingSpins === 1 ? '' : ' '}`;
   } else if (isUnavailable) {
     label = 'Indisponível';
   }
