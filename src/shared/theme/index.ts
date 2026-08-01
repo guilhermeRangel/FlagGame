@@ -5,9 +5,13 @@ export const colors = {
   primary: '#4FD1C5',
   primaryPressed: '#38B2AC',
   textPrimary: '#FFFFFF',
+  textOnPrimary: '#081225',
   textSecondary: '#B7C2D6',
   disabled: '#667085',
+  success: '#34D399',
+  successSurface: '#123A2A',
   danger: '#EF4444',
+  dangerSurface: '#3A1824',
   border: '#263A5B',
 } as const;
 

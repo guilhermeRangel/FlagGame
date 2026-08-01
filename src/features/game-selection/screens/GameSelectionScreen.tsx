@@ -15,7 +15,7 @@ export function GameSelectionScreen() {
   useScreenOrientation(ScreenOrientation.OrientationLock.PORTRAIT);
 
   const handleOptionPress = (option: GameOption) => {
-    if (!option.isAvailable || !option.route) {
+    if (!option.isAvailable) {
       return;
     }
 

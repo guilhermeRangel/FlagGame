@@ -23,7 +23,11 @@ export function Header({ title, onBack, rightAction }: HeaderProps) {
         <View style={styles.backButtonPlaceholder} />
       )}
       <Text style={styles.title}>{title}</Text>
-      {rightAction ? <View style={styles.rightAction}>{rightAction}</View> : <View style={styles.backButtonPlaceholder} />}
+      {rightAction ? (
+        <View style={styles.rightAction}>{rightAction}</View>
+      ) : (
+        <View style={styles.backButtonPlaceholder} />
+      )}
     </View>
   );
 }

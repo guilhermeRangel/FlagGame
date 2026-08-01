@@ -8,6 +8,7 @@ export type RootStackParamList = {
   [ROUTES.INFORMATION]: undefined;
   [ROUTES.GAME_SELECTION]: undefined;
   [ROUTES.FLAG_GAME]: undefined;
+  [ROUTES.GUESS_FLAG_GAME]: undefined;
 };
 
 export type AppNavigationProp = NativeStackNavigationProp<RootStackParamList>;

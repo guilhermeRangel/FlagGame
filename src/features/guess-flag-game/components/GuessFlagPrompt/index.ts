@@ -1,0 +1,1 @@
+export { GuessFlagPrompt } from './GuessFlagPrompt';

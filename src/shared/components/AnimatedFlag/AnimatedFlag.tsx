@@ -6,16 +6,17 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import { colors, spacing } from '@/shared/theme';
+import type { FlagAssetSource } from '@/shared/domain/flags';
 
 type AnimatedFlagProps = {
-  emoji: string;
+  source: FlagAssetSource;
   size?: number;
   duration?: number;
 };
 
-export function AnimatedFlag({ emoji, size = 48, duration = 2200 }: AnimatedFlagProps) {
+export function AnimatedFlag({ source, size = 48, duration = 2200 }: AnimatedFlagProps) {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export function AnimatedFlag({ emoji, size = 48, duration = 2200 }: AnimatedFlag
 
   return (
     <Animated.View style={[styles.flag, { width: size, height: size }, animatedStyle]}>
-      <Text style={styles.emoji}>{emoji}</Text>
+      <Image source={source} style={styles.image} resizeMode="contain" accessible={false} />
     </Animated.View>
   );
 }
@@ -45,7 +46,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     margin: spacing.sm,
   },
-  emoji: {
-    fontSize: 28,
+  image: {
+    width: '78%',
+    height: '78%',
   },
 });

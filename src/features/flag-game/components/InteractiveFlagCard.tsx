@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Image, Pressable, StyleSheet, Text } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -7,7 +7,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { colors, borderRadius, fontSizes, spacing } from '@/shared/theme';
-import type { Flag, RotationSpeed } from '@/features/flag-game/types';
+import type { Flag } from '@/shared/domain/flags';
+import type { RotationSpeed } from '@/features/flag-game/types';
 
 type InteractiveFlagCardProps = {
   readonly flag: Flag;
@@ -50,9 +51,18 @@ export function InteractiveFlagCard({ flag, speed, onPress }: InteractiveFlagCar
       <Animated.View
         style={[styles.flagDisplay, isUnavailable && styles.flagDisplayUnavailable, animatedStyle]}
       >
-        <Text style={[styles.emoji, isUnavailable && styles.emojiUnavailable]}>
-          {flag.visual.type === 'emoji' ? flag.visual.value : '🏁'}
-        </Text>
+        {flag.visual.type === 'emoji' ? (
+          <Text style={[styles.emoji, isUnavailable && styles.visualUnavailable]}>
+            {flag.visual.value}
+          </Text>
+        ) : (
+          <Image
+            source={flag.visual.source}
+            style={[styles.asset, isUnavailable && styles.visualUnavailable]}
+            resizeMode="contain"
+            accessible={false}
+          />
+        )}
       </Animated.View>
       <Text style={styles.countryName} numberOfLines={2} ellipsizeMode="tail">
         {flag.countryName}
@@ -93,8 +103,12 @@ const styles = StyleSheet.create({
   emoji: {
     fontSize: 26,
   },
-  emojiUnavailable: {
+  visualUnavailable: {
     opacity: 0.55,
+  },
+  asset: {
+    width: '86%',
+    height: '76%',
   },
   countryName: {
     color: colors.textPrimary,

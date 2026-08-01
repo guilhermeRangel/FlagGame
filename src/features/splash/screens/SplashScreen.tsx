@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '@/shared/components/ScreenContainer';
 import { AnimatedFlag } from '@/shared/components/AnimatedFlag';
 import { ROUTES } from '@/shared/constants/routes';
+import { FLAG_ASSETS } from '@/shared/domain/flags';
 import { colors, fontSizes, spacing } from '@/shared/theme';
 import type { AppNavigationProp } from '@/shared/types/navigation';
 import { useSplashAnimation } from '@/features/splash/hooks/useSplashAnimation';
@@ -16,7 +17,7 @@ export function SplashScreen() {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace(ROUTES.WELCOME);
-    }, 2200);
+    }, 3200);
 
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -33,9 +34,9 @@ export function SplashScreen() {
           <Text style={styles.title}>Flag World</Text>
           <Text style={styles.subtitle}>Explore, jogue e descubra bandeiras</Text>
           <View style={styles.flagRow}>
-            <AnimatedFlag emoji="🇧🇷" size={54} duration={2200} />
-            <AnimatedFlag emoji="🇺🇸" size={54} duration={2600} />
-            <AnimatedFlag emoji="🇯🇵" size={54} duration={2400} />
+            <AnimatedFlag source={FLAG_ASSETS.br} size={54} duration={2200} />
+            <AnimatedFlag source={FLAG_ASSETS.us} size={54} duration={2600} />
+            <AnimatedFlag source={FLAG_ASSETS.jp} size={54} duration={2400} />
           </View>
         </Animated.View>
       </View>

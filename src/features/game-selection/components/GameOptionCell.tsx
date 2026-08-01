@@ -22,10 +22,12 @@ export function GameOptionCell({ option, onPress }: GameOptionCellProps) {
       ]}
     >
       <View style={styles.iconWrapper}>
-        <Text style={styles.iconText}>{option.isAvailable ? '▶' : '⏳'}</Text>
+        <Text style={styles.iconText}>{option.isAvailable ? '▶' : '○'}</Text>
       </View>
       <View style={styles.content}>
-        <Text style={[styles.title, !option.isAvailable && styles.titleDisabled]}>{option.title}</Text>
+        <Text style={[styles.title, !option.isAvailable && styles.titleDisabled]}>
+          {option.title}
+        </Text>
         <Text style={[styles.description, !option.isAvailable && styles.titleDisabled]}>
           {option.description}
         </Text>

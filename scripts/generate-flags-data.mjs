@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 
 const sourcePath = process.argv[2];
 
@@ -46,14 +46,8 @@ const rows = entries
   .map(([code, name]) => `  [${JSON.stringify(code)}, ${JSON.stringify(name)}],`)
   .join('\n');
 
-const output = `import type { Flag } from '@/features/flag-game/types';
-
-const shuffleOffset = 0.5;
-const initialFlagsAmount = 30;
-const regionalIndicatorA = 0x1f1e6;
-const asciiUppercaseA = 65;
-const tagBase = 0xe0000;
-const cancelTag = 0xe007f;
+const output = `import type { Flag } from '@/shared/domain/flags/types';
+import { FLAG_ASSETS } from '@/shared/domain/flags/flags.assets';
 
 type RegionFlagEntry = readonly [code: string, countryName: string];
 type SubdivisionFlagEntry = readonly [id: string, countryName: string, tag: string];
@@ -68,48 +62,21 @@ const SUBDIVISION_FLAGS: readonly SubdivisionFlagEntry[] = [
   ['gb-wls', 'País de Gales', 'gbwls'],
 ];
 
-function getRegionFlagEmoji(regionCode: string): string {
-  const codePoints = [...regionCode].map(
-    (character) => regionalIndicatorA + character.charCodeAt(0) - asciiUppercaseA,
-  );
-
-  return String.fromCodePoint(...codePoints);
-}
-
-function getSubdivisionFlagEmoji(tag: string): string {
-  const codePoints = [...tag].map((character) => tagBase + character.charCodeAt(0));
-  return String.fromCodePoint(0x1f3f4, ...codePoints, cancelTag);
-}
-
-export const FLAG_OPTIONS: Flag[] = [
+export const FLAG_OPTIONS: readonly Flag[] = [
   ...REGION_FLAGS.map(([code, countryName]) => ({
     id: code.toLowerCase(),
     countryName,
-    visual: { type: 'emoji' as const, value: getRegionFlagEmoji(code) },
+    visual: { type: 'asset' as const, source: FLAG_ASSETS[code.toLowerCase()] },
   })),
-  ...SUBDIVISION_FLAGS.map(([id, countryName, tag]) => ({
+  ...SUBDIVISION_FLAGS.map(([id, countryName]) => ({
     id,
     countryName,
-    visual: { type: 'emoji' as const, value: getSubdivisionFlagEmoji(tag) },
+    visual: { type: 'asset' as const, source: FLAG_ASSETS[id] },
   })),
 ];
-
-export function getRandomFlags(flags: readonly Flag[], amount: number): Flag[] {
-  if (amount <= 0) {
-    return [];
-  }
-
-  const shuffled = [...flags].sort(() => Math.random() - shuffleOffset);
-
-  if (amount >= flags.length) {
-    return shuffled;
-  }
-
-  return shuffled.slice(0, amount);
-}
-
-export const initialFlagGameAmount = initialFlagsAmount;
 `;
 
-writeFileSync(resolve('src/features/flag-game/data/flags.data.ts'), output);
+const outputPath = resolve('src/shared/domain/flags/flags.data.ts');
+mkdirSync(dirname(outputPath), { recursive: true });
+writeFileSync(outputPath, output);
 console.log(`Catálogo criado com ${entries.length + 3} bandeiras.`);

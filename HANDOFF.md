@@ -1,96 +1,234 @@
-# Handoff — Continuação do projeto Flag Game
+# Handoff — Flag World
 
-## Intenção deste handoff
+Atualizado em: 2026-08-01
 
-Este documento existe para que o próximo modelo entenda rapidamente o estado atual do projeto e continue de forma consistente. A meta principal é evoluir o app sem recomeçar do zero, preservando a estrutura já criada e evitando regressões.
+## Objetivo deste documento
 
-## Contexto do projeto
+Este é o estado consolidado do projeto. Continue a partir da arquitetura existente, preserve a compatibilidade com Expo Go 54 e consulte também os handoffs incrementais em [docs/handoffs](docs/handoffs) antes de alterar uma feature relevante.
 
-- App mobile em React Native + Expo + TypeScript.
-- Stack atual: Expo SDK 54 (`expo ~54.0.36`), React Native 0.81.5, React 19.1 e TypeScript 5.9.
-- A linha do SDK 54 foi escolhida para manter compatibilidade com o Expo Go 54 em aparelhos físicos Android e iOS via QR Code.
-- Objetivo atual: manter o fluxo principal funcional e continuar refinando a experiência do jogo de bandeiras.
-- O fluxo já implementado é: Splash → Welcome → Information → Game Selection → Flag Game.
+## Stack e compatibilidade
 
-## Estado atual confirmado
+- React Native + Expo + TypeScript com tipagem estrita.
+- Expo SDK 54 (`expo ~54.0.36`).
+- React Native 0.81.5 e React 19.1.
+- TypeScript 5.9.
+- `expo-audio` 1.1.1 para música e efeitos locais.
+- React Navigation 7 com native stack tipada.
+- Reanimated 4 para animações leves.
+- A linha do SDK 54 foi mantida para abrir no Expo Go 54 de aparelhos físicos Android e iOS por QR Code.
 
-- Navegação tipada e centralizada, com pilha corrigida: Welcome usa `navigate` (não `replace`) para abrir a seleção de jogos, então o botão voltar funciona em toda a cadeia Welcome → Information/Game Selection → Flag Game.
-- Orientação por tela: Welcome e Information ficam livres (padrão do sistema); Game Selection e Flag Game são travadas em `PORTRAIT` (não mais `LANDSCAPE`).
-- Tela de seleção de jogos implementada com `FlatList` (`flex: 1` explícito) rolável, 10 opções (1 disponível, 9 "em breve").
-- Tela Welcome com tema musical local em loop, controlado pelo botão Música/Silencioso com `expo-audio`.
-- Tela de jogo principal com grade de 3 colunas por linha e 30 bandeiras sorteadas por rodada, dentro de um `ScrollView`.
-- O catálogo contém as 262 bandeiras RGI de países/regiões e subdivisões disponíveis no Unicode Emoji 17.0: 259 regionais mais Inglaterra, Escócia e País de Gales.
-- Cada card aceita quatro interações; ao atingir o limite ele é desabilitado, recebe aparência esgotada e deixa de atualizar o estado.
-- Information, Game Selection e Flag Game usam 32 px de padding horizontal pelo token `spacing.xl`; o `ScreenContainer` mantém 24 px como padrão para as demais telas.
-- Estrutura organizada em [src/app](src/app), [src/features](src/features) e [src/shared](src/shared).
-- Tema compartilhado e componentes reutilizáveis existentes.
-- O projeto passou na validação de tipos com `npx tsc --noEmit`.
-- Testado manualmente no emulador Android via `adb` (navegação completa Welcome → Game Selection → volta, e Game Selection → Flag Game), confirmando orientação e rolagem corretas.
+## Fluxo de navegação atual
 
-## Arquivos e áreas importantes
+```text
+Splash
+  ↓ replace
+Welcome
+  ├── Information
+  └── Game Selection
+        ├── Bandeiras Giratórias → Flag Game
+        └── Qual é a Bandeira?  → Guess Flag Game
+```
 
-- [App.tsx](App.tsx): ponto de entrada da aplicação.
-- [src/app/navigation/AppNavigator.tsx](src/app/navigation/AppNavigator.tsx): fluxo principal de telas e rotas.
-- [src/features/welcome/screens/WelcomeScreen.tsx](src/features/welcome/screens/WelcomeScreen.tsx): tela inicial; usa `navigate` para preservar a pilha de navegação.
-- [src/shared/theme/index.ts](src/shared/theme/index.ts): cores, espaçamentos, tipografia e tokens visuais.
-- [src/shared/components/ScreenContainer/ScreenContainer.tsx](src/shared/components/ScreenContainer/ScreenContainer.tsx): wrapper comum das telas.
-- [src/features/flag-game/screens/FlagGameScreen.tsx](src/features/flag-game/screens/FlagGameScreen.tsx): gameplay principal, grade 5 colunas em `ScrollView`, portrait.
-- [src/features/flag-game/data/flags.data.ts](src/features/flag-game/data/flags.data.ts): catálogo Unicode com 262 bandeiras; 30 são sorteadas por rodada.
-- [src/features/flag-game/components/InteractiveFlagCard.tsx](src/features/flag-game/components/InteractiveFlagCard.tsx): card adaptado para grade (larguras percentuais).
-- [src/features/game-selection/screens/GameSelectionScreen.tsx](src/features/game-selection/screens/GameSelectionScreen.tsx): tela de seleção dos modos, portrait.
-- [src/shared/assets/audio/welcome-theme.wav](src/shared/assets/audio/welcome-theme.wav): tema original de 12 segundos usado na Welcome.
-- [scripts/generate-welcome-theme.mjs](scripts/generate-welcome-theme.mjs): gerador reproduzível do tema musical.
-- [scripts/generate-flags-data.mjs](scripts/generate-flags-data.mjs): gerador do catálogo a partir do `emoji-test.txt` oficial.
+- `Welcome → Game Selection` usa `navigate`, preservando a tela anterior.
+- A seleção navega pela rota armazenada nos dados do item, sem comparação por índice.
+- Ambos os jogos usam `navigation.goBack()` para retornar à seleção.
+- Jogar novamente no quiz reinicia o reducer local; não empilha uma segunda tela.
+- A fonte canônica das rotas é [src/shared/constants/routes.ts](src/shared/constants/routes.ts). O diretório legado `src/app/routes/` não possui consumidores e não deve virar uma segunda fonte de verdade.
 
-## Últimas correções aplicadas (mais recentes primeiro)
+## Estado confirmado do aplicativo
 
-- Adicionado áudio real ao botão da Welcome com `expo-audio`, incluído no Expo Go do SDK 54; o áudio começa apenas após o toque do usuário e pode ser pausado pelo mesmo botão.
-- Corrigido o `ScreenContainer` para usar uma `View` interna, evitando que o `SafeAreaView` do iOS ignore o padding do conteúdo. Information, Game Selection e Flag Game agora usam 32 px somente nas laterais.
-- Expandido o catálogo de 30 para 262 bandeiras RGI do Unicode Emoji 17.0, mantendo 30 itens aleatórios por rodada por desempenho e legibilidade.
-- Ao completar quatro toques, o card da bandeira agora fica desabilitado, muda para cores de indisponibilidade e exibe o texto “Indisponível”.
-- Migrado o projeto do SDK 57 para o Expo SDK 54 para abrir no Expo Go 54 por QR Code; dependências Expo/React Native foram alinhadas e validadas com Expo Doctor.
-- Corrigido bug de navegação: `WelcomeScreen` chamava `navigation.replace(ROUTES.GAME_SELECTION)`, removendo a Welcome da pilha e quebrando o botão voltar em Game Selection. Trocado para `navigation.navigate(...)`.
-- Trocada a orientação de `GameSelectionScreen` e `FlagGameScreen` de `LANDSCAPE` para `PORTRAIT`.
-- `GameSelectionScreen`: adicionado `style={{ flex: 1 }}` ao `FlatList` para garantir rolagem confiável em qualquer orientação.
-- `FlagGameScreen`: lista horizontal (`FlatList`) trocada por `ScrollView` com grade `flexWrap`; atualmente são 3 colunas por linha, com cards mais largos para melhorar a leitura dos países.
-- `flags.data.ts`: expandido de 10 para 30 países; `getRandomFlags` corrigido para embaralhar mesmo quando a quantidade pedida é igual ao total (antes retornava a ordem original sem embaralhar).
-- `InteractiveFlagCard`: redimensionado para caber em colunas estreitas (largura percentual, fontes menores, `numberOfLines`/`ellipsizeMode` para evitar overflow).
+- Welcome com tema musical local, controlado pelo botão Música/Silencioso.
+- A música é pausada quando Welcome perde o foco, evitando sobreposição com os efeitos dos jogos.
+- Information, Game Selection, Flag Game e Guess Flag Game usam 32 px de padding horizontal.
+- Game Selection possui dez opções: duas disponíveis e oito marcadas como “Em breve”.
+- Game Selection e os dois jogos solicitam orientação `PORTRAIT` pelo hook compartilhado.
+- Catálogo compartilhado com 262 bandeiras RGI do Unicode Emoji 17.0, renderizadas por PNGs locais do Twemoji.
+- O aplicativo não depende mais da fonte de emojis do sistema para mostrar bandeiras.
+- O domínio global `Flag`, `FlagVisual` e `FLAG_OPTIONS` fica em `src/shared/domain/flags/`.
 
-## Regras importantes para o próximo modelo
+## Jogo 1 — Bandeiras Giratórias
 
-- Preserve a arquitetura atual; não reescreva o projeto do zero.
-- Use aliases absolutos com `@` já configurados.
-- Mantenha tipagem forte e evite qualquer regressão em navegação.
-- Prefira mudanças pequenas e localizadas.
-- Para áudio, use `expo-audio` compatível com o SDK 54; não reintroduza `expo-av`, que está obsoleto.
-- Para manter estabilidade, teste com `npx tsc --noEmit` antes de afirmar que está pronto.
+- Mostra 30 bandeiras aleatórias por rodada em `ScrollView`.
+- Grade de três colunas, usando `width: '31%'` para evitar quebra por arredondamento do Yoga.
+- Cada bandeira aceita quatro toques, acumulando 90° por toque até completar 360°.
+- Após o quarto toque, o card fica desabilitado, muda para aparência indisponível e deixa de atualizar o estado.
+- Resetar limpa os giros; Sortear novamente escolhe outras 30 bandeiras.
+- Regras de rotação, estado e randomização continuam exclusivas da feature `flag-game`.
 
-## Armadilhas conhecidas (aprendidas durante a validação)
+## Jogo 2 — Qual é a Bandeira?
 
-- **Larguras percentuais em grade com `flexWrap`**: evite usar exatamente `33.33%` em três colunas, pois o arredondamento do Yoga pode derrubar o último card para outra linha. A grade usa `width: '31%'` com `justifyContent: 'space-between'`.
-- **`adb shell monkey -p <pkg> -c android.intent.category.LAUNCHER 1`** não é um "relaunch limpo": o argumento numérico injeta esse tanto de eventos de toque aleatórios após abrir o app. Para reabrir sem efeitos colaterais, use `adb shell am start -n <pkg>/<activity>` (ou `force-stop` + `am start`).
-- **Restauração de estado de navegação**: forçar reabertura via deep link (`am start -a VIEW -d exp://...`) pode restaurar a última tela aberta (não a Splash), e remontar telas anteriores da pilha ao mesmo tempo — isso pode causar corrida entre travamentos de orientação de telas diferentes. Para testar orientação de forma confiável, prefira navegar manualmente (tela a tela) a partir de um estado limpo (`pm clear` ou `force-stop`) em vez de confiar em deep link direto após uso prévio do app.
+- Feature independente em `src/features/guess-flag-game/`.
+- Dez rodadas por partida e três alternativas por rodada.
+- As dez bandeiras corretas são diferentes dentro da mesma partida.
+- Alternativas não repetem ID/nome, incluem exatamente uma correta e têm posição embaralhada.
+- Catálogos reduzidos diminuem com segurança a quantidade de rodadas/opções; catálogo vazio mostra estado amigável.
+- A geração usa Fisher–Yates imutável e aceita uma fonte aleatória opcional para validação determinística futura.
+
+### Estado e transições
+
+O hook `useGuessFlagGame` possui um reducer coeso com:
+
+- `rounds`, índice atual e `gameId`;
+- score, acertos, erros, sequência e melhor sequência;
+- opção selecionada e feedback atual;
+- status `playing`, `showing-feedback`, `finished` ou `unavailable`.
+
+Fluxo:
+
+```text
+playing
+  ↓ primeira resposta válida
+showing-feedback
+  ↓ 1200 ms (timer com cleanup)
+playing na próxima rodada
+  ↓ última rodada
+finished
+```
+
+- O reducer ignora respostas quando não está em `playing`, inclusive dois despachos rápidos no mesmo batch.
+- A tela não cria perguntas, não calcula pontuação e não controla timers.
+- `currentRound` é derivada de `rounds[currentRoundIndex]`, evitando estado duplicado.
+
+### Pontuação
+
+- Acerto: 100 pontos.
+- Primeiro e segundo acertos consecutivos: 100 pontos cada.
+- Terceiro acerto consecutivo e seguintes: 125 pontos (100 + bônus de 25).
+- Erro: zero ponto e sequência volta para zero.
+- O resultado mostra pontos, acertos, erros, melhor sequência e mensagem de desempenho.
+
+### Interface e acessibilidade
+
+- HUD compacto com rodada, score, acertos e sequência.
+- Prompt local com entrada suave; não reutiliza a animação infinita do primeiro jogo.
+- A abstração visual renderiza emoji ou asset real nos dois jogos; o catálogo atual usa assets locais para evitar glifos `?` em runtimes sem suporte adequado.
+- Opções possuem estados puros `idle`, `correct`, `incorrect` e `disabled`.
+- Acerto usa verde + ✓ + texto; erro usa vermelho + ✕ + texto, sem depender só de cor.
+- O leitor de tela não recebe o nome da bandeira antes da resposta, pois isso entregaria a solução.
+- Falha na lista mostra “Não foi possível carregar as bandeiras.” e Tentar novamente.
+
+### Áudio
+
+- Três WAVs originais em `src/shared/assets/audio/game-effects/`:
+  - `correct-answer.wav`;
+  - `incorrect-answer.wav`;
+  - `game-finished.wav`.
+- `useGuessFlagGameSounds` possui três players estáticos de `expo-audio`.
+- Cada reprodução pausa os demais players, volta ao início e usa proteção contra corridas/unmount.
+- Falhas de áudio são absorvidas e nunca interrompem o jogo.
+- `useAudioPlayer` libera os recursos ao desmontar; não chamar `remove()` manualmente nesses players.
+
+## Estrutura principal
+
+```text
+src/
+  app/navigation/
+  features/
+    flag-game/
+    game-selection/
+    guess-flag-game/
+      components/
+      constants/
+      hooks/
+      screens/
+      types/
+      utils/
+  shared/
+    assets/audio/
+    components/
+    domain/flags/
+    hooks/
+    theme/
+    types/
+docs/handoffs/
+scripts/
+```
+
+## Arquivos importantes
+
+- [src/app/navigation/AppNavigator.tsx](src/app/navigation/AppNavigator.tsx): pilha e registro das telas.
+- [src/shared/constants/routes.ts](src/shared/constants/routes.ts): constantes canônicas de rota.
+- [src/shared/types/navigation.ts](src/shared/types/navigation.ts): `RootStackParamList`.
+- [src/features/game-selection/data/game-options.ts](src/features/game-selection/data/game-options.ts): opções e disponibilidade dos jogos.
+- [src/shared/domain/flags/flags.data.ts](src/shared/domain/flags/flags.data.ts): catálogo compartilhado de 262 bandeiras.
+- [src/shared/domain/flags/flags.assets.ts](src/shared/domain/flags/flags.assets.ts): mapa estático entre IDs e PNGs reconhecido pelo Metro.
+- [src/shared/assets/flags](src/shared/assets/flags): 262 imagens locais e atribuição do Twemoji.
+- [src/shared/domain/flags/types.ts](src/shared/domain/flags/types.ts): domínio neutro, sem dependência de React Native.
+- [src/features/flag-game/screens/FlagGameScreen.tsx](src/features/flag-game/screens/FlagGameScreen.tsx): primeiro jogo.
+- [src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx](src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx): composição da tela do quiz.
+- [src/features/guess-flag-game/hooks/useGuessFlagGame.ts](src/features/guess-flag-game/hooks/useGuessFlagGame.ts): reducer e lifecycle da partida.
+- [src/features/guess-flag-game/hooks/useGuessFlagGameSounds.ts](src/features/guess-flag-game/hooks/useGuessFlagGameSounds.ts): efeitos sem expor players à tela.
+- [src/features/guess-flag-game/utils/createGuessFlagGameQuestions.ts](src/features/guess-flag-game/utils/createGuessFlagGameQuestions.ts): geração pura das perguntas.
+- [scripts/generate-flags-data.mjs](scripts/generate-flags-data.mjs): regenera o catálogo compartilhado.
+- [scripts/download-flag-assets.mjs](scripts/download-flag-assets.mjs): baixa/valida os PNGs e regenera o mapa estático.
+- [scripts/generate-welcome-theme.mjs](scripts/generate-welcome-theme.mjs): regenera o tema da Welcome.
+- [scripts/generate-game-effects.mjs](scripts/generate-game-effects.mjs): regenera os três efeitos do quiz.
+- [docs/handoffs/2026-08-01-guess-flag-game.md](docs/handoffs/2026-08-01-guess-flag-game.md): detalhes da sessão do segundo jogo.
+- [docs/handoffs/2026-08-01-local-flag-assets.md](docs/handoffs/2026-08-01-local-flag-assets.md): migração de emojis para imagens locais.
+
+## Decisões arquiteturais
+
+- Compartilhar apenas o domínio real de bandeiras; não mover rotação ou componentes do primeiro jogo para `shared`.
+- Manter as regras do quiz independentes de React Native e da feature `flag-game`.
+- Usar reducer em vez de vários `useState` desconectados.
+- Gerar toda a partida uma única vez ao iniciar/reiniciar.
+- Usar valores configuráveis para quantidade de rodadas, opções, pontos e duração do feedback.
+- Usar união discriminada em `GameOption`: item disponível exige rota em compile-time.
+- Não adicionar biblioteca de testes, áudio remoto, `expo-av`, permissão ou plugin nativo.
+
+## Validações da sessão de 2026-08-01
+
+- `npx tsc --noEmit`: passou.
+- ESLint completo: zero erros e zero warnings de código; permanece apenas o aviso de depreciação da configuração `.eslintrc` no ESLint 9.
+- `npx expo-doctor@latest`: 18/18 verificações passaram.
+- Bundles Hermes Android e iOS: HTTP 200.
+- Catálogo: 262 IDs únicos confirmados.
+- Assets: 262 PNGs válidos e mapeados estaticamente; Welcome e quiz renderizaram bandeiras reais no simulador sem glifos `?`.
+- WAVs: três arquivos PCM mono, 16-bit, 22.050 Hz válidos.
+- Geração determinística: dez corretas únicas, três alternativas únicas, catálogo não mutado e redução segura para catálogo pequeno.
+- Simulação do reducer: erro, bloqueio de segunda resposta, 10 rodadas, bônus 100/100/125, finalização, score, melhor sequência e restart validados.
+- Expo Go abriu a nova tela em um iPhone 17 Pro simulado com iOS 26.3; HUD, prompt e três opções renderizaram.
+- Um reload real encontrou e permitiu corrigir a pausa de um player já liberado durante Fast Refresh.
+- Antes desta sessão, o fluxo Welcome → Game Selection → voltar e Game Selection → Bandeiras Giratórias já havia sido percorrido manualmente em emulador Android, incluindo orientação e rolagem.
+
+Não foi possível percorrer o fluxo inteiro por toques no simulador: não havia Android conectado e o ambiente não disponibilizou automação de entrada no Simulator. Portanto, acerto/erro/resultado foram validados na lógica executável, mas não devem ser descritos como teste manual ponta a ponta da interface.
+
+## Limitações e observações conhecidas
+
+- Os gráficos de bandeira são do Twemoji e usam licença CC BY 4.0; preserve a atribuição no README ao redistribuí-los.
+- `lockAsync(PORTRAIT)` emitiu aviso de orientação não suportada nesse simulador específico; a exceção foi tratada e `app.json` continua fixado em portrait.
+- `adb shell monkey -p <pkg> -c android.intent.category.LAUNCHER 1` injeta um toque aleatório além de abrir o app; para um relaunch previsível, prefira `force-stop` seguido de `adb shell am start -n <pkg>/<activity>`.
+- Reabrir por deep link pode restaurar a última tela e remontar telas anteriores, provocando disputa entre locks de orientação. Para validar orientação, navegue manualmente a partir de estado limpo.
+- O quiz ainda não possui cronômetro, dificuldade, persistência de score ou ranking.
+- O randomizador legado do primeiro jogo ainda usa `sort` aleatório; o quiz já usa Fisher–Yates.
+- `src/app/routes/` é legado e não utilizado. Evite importar dele.
+
+## Regras para próximas sessões
+
+- Leia `AGENTS.md`, este handoff e o handoff específico mais recente antes de alterar código.
+- Preserve Expo SDK 54 enquanto a meta for Expo Go 54 em aparelhos físicos.
+- Use aliases `@/`, tipagem estrita e componentes/regras na feature correta.
+- Toda sessão que alterar comportamento, navegação, arquitetura ou feature relevante deve criar/atualizar um arquivo em `docs/handoffs/`.
+- Execute no mínimo TypeScript e uma validação de bundle antes de afirmar que está pronto.
+- Não afirme validação manual que não aconteceu.
 
 ## Comandos úteis
 
-- `npm install`
-- `npx tsc --noEmit`
-- `npx expo start`
-- `npx expo start --clear` para gerar um QR Code com cache limpo
-- `npx expo start --android`
-- `npx expo run:android` (build nativo, caminho mais confiável de validação no Android)
-- `adb devices` para validar o emulador antes de rodar no Android
+```bash
+npm install
+npx tsc --noEmit
+ESLINT_USE_FLAT_CONFIG=false npx eslint "src/**/*.{ts,tsx}" "scripts/*.mjs"
+npx expo-doctor@latest
+npx expo start --clear
+node scripts/generate-welcome-theme.mjs
+node scripts/generate-game-effects.mjs
+node scripts/download-flag-assets.mjs
+```
 
-## Observações conhecidas
+## Próximas prioridades recomendadas
 
-- O catálogo segue o Unicode Emoji 17.0. A bandeira de Sark e as bandeiras por tag (Inglaterra, Escócia e País de Gales) podem cair para letras/bandeira preta em versões antigas do sistema, dependendo da fonte de emojis do aparelho.
-- Alguns warnings de depreciação podem aparecer em `SafeAreaView`, mas não bloquearam a execução.
-- A execução no Android depende de um emulador ativo e acessível pelo ADB.
-- O objetivo agora é continuar evoluindo a experiência, não refazer a base.
-
-## Prioridade recomendada
-
-1. Manter o fluxo atual estável (navegação e orientação já validadas ponta a ponta).
-2. Melhorar UI/UX e conteúdo do jogo.
-3. Adicionar novos modos apenas se a base continuar estável.
-4. Validar sempre com TypeScript e pelo menos um teste de execução no emulador.
+1. Fazer teste manual completo do quiz em aparelho físico: um acerto, um erro, dez rodadas, reinício e voltar.
+2. Confirmar volume e distinção dos três efeitos em Android e iOS físicos.
+3. Adicionar dificuldade ou cronômetro apenas mantendo o reducer configurável.
+4. Considerar persistência de melhor pontuação sem acoplar storage à tela.
+5. Remover a definição legada `src/app/routes/` em uma limpeza dedicada, após confirmar que nenhum consumidor externo depende dela.

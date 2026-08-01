@@ -1,6 +1,7 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ScreenContainer } from '@/shared/components/ScreenContainer';
 import { Header } from '@/shared/components/Header';
+import { FLAG_ASSETS } from '@/shared/domain/flags';
 import { colors, fontSizes, spacing } from '@/shared/theme';
 
 type InformationScreenProps = {
@@ -15,7 +16,12 @@ export function InformationScreen({ navigation }: InformationScreenProps) {
       <Header title="Sobre o jogo" onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heroImage}>
-          <Text style={styles.heroEmoji}>🌎</Text>
+          <Image
+            source={FLAG_ASSETS.un}
+            style={styles.heroFlag}
+            resizeMode="contain"
+            accessible={false}
+          />
         </View>
         <Text style={styles.sectionTitle}>Flag World</Text>
         <Text style={styles.bodyText}>
@@ -52,8 +58,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.lg,
   },
-  heroEmoji: {
-    fontSize: 120,
+  heroFlag: {
+    width: 150,
+    height: 110,
   },
   sectionTitle: {
     color: colors.textPrimary,

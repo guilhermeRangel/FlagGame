@@ -20,13 +20,16 @@ export function AppButton({
   accessibilityLabel,
   style,
 }: AppButtonProps) {
-  const buttonVariant = variant === 'danger' ? 'danger' : variant === 'secondary' ? 'secondary' : 'primary';
+  const buttonVariant =
+    variant === 'danger' ? 'danger' : variant === 'secondary' ? 'secondary' : 'primary';
   const backgroundColor =
     buttonVariant === 'danger'
       ? colors.danger
       : buttonVariant === 'secondary'
         ? colors.surface
         : colors.primary;
+  const titleColor =
+    !disabled && buttonVariant === 'primary' ? colors.textOnPrimary : colors.textPrimary;
 
   return (
     <Pressable
@@ -38,12 +41,20 @@ export function AppButton({
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: disabled ? colors.disabled : pressed ? colors.surfacePressed : backgroundColor,
+          backgroundColor: disabled
+            ? colors.disabled
+            : pressed
+              ? buttonVariant === 'primary'
+                ? colors.primaryPressed
+                : buttonVariant === 'danger'
+                  ? colors.dangerSurface
+                  : colors.surfacePressed
+              : backgroundColor,
         },
         style,
       ]}
     >
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
     </Pressable>
   );
 }
@@ -58,7 +69,6 @@ const styles = StyleSheet.create({
     minHeight: 46,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: fontSizes.md,
     fontWeight: '600',
   },

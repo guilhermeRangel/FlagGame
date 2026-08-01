@@ -1,4 +1,4 @@
-import type { Flag } from '@/features/flag-game/types';
+import type { Flag } from '@/shared/domain/flags';
 
 export interface FlagRandomizer {
   randomize(flags: readonly Flag[], amount: number): Flag[];

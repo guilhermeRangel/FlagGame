@@ -1,0 +1,7 @@
+export const GUESS_FLAG_OPTION_COUNT = 3;
+export const GUESS_FLAG_TOTAL_ROUNDS = 10;
+export const ANSWER_FEEDBACK_DURATION_MS = 1200;
+
+export const BASE_CORRECT_ANSWER_POINTS = 100;
+export const STREAK_BONUS_THRESHOLD = 3;
+export const STREAK_BONUS_POINTS = 25;

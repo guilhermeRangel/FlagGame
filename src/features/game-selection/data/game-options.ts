@@ -10,6 +10,13 @@ export const GAME_OPTIONS: GameOption[] = [
     isAvailable: true,
   },
   {
+    id: 'guess-flag',
+    title: 'Qual é a Bandeira?',
+    description: 'Observe a bandeira e escolha o país correto.',
+    route: ROUTES.GUESS_FLAG_GAME,
+    isAvailable: true,
+  },
+  {
     id: 'discover-country',
     title: 'Descubra o País',
     description: 'Em breve você poderá descobrir países pelo desenho.',
@@ -20,13 +27,6 @@ export const GAME_OPTIONS: GameOption[] = [
     id: 'memory',
     title: 'Memória das Bandeiras',
     description: 'Em breve você poderá testar sua memória.',
-    isAvailable: false,
-    badge: 'Em breve',
-  },
-  {
-    id: 'guess-flag',
-    title: 'Qual é a Bandeira?',
-    description: 'Em breve você poderá adivinhar a bandeira correta.',
     isAvailable: false,
     badge: 'Em breve',
   },
