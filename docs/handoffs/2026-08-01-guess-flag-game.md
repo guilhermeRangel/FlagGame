@@ -4,6 +4,8 @@ Data: 2026-08-01
 
 > Atualização posterior: o fallback de emojis registrado nesta sessão foi resolvido com PNGs locais. Consulte `docs/handoffs/2026-08-01-local-flag-assets.md` para o estado atual.
 
+> Atualização posterior: o motor, a dificuldade, os sons e os componentes comuns deste quiz foram extraídos para `src/shared/gameplay/flag-quiz/` ao criar “Encontre a Bandeira”. Consulte `docs/handoffs/2026-08-01-find-flag-game.md`.
+
 ## Objetivo
 
 Implementar o segundo jogo do Flag World sem recriar o projeto, preservando Expo SDK 54, tema, navegação tipada e o primeiro jogo. A nova experiência apresenta uma bandeira e três países por dez rodadas, com pontuação, feedback visual/sonoro e resultado final.

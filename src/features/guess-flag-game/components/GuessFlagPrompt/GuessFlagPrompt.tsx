@@ -1,12 +1,13 @@
-import { Image, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import { FlagVisual } from '@/shared/gameplay/flag-quiz';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
-import type { FlagVisual } from '@/shared/domain/flags';
+import type { FlagVisual as FlagVisualValue } from '@/shared/domain/flags';
 
 type GuessFlagPromptTone = 'neutral' | 'correct' | 'incorrect';
 
 type GuessFlagPromptProps = {
-  readonly visual: FlagVisual;
+  readonly visual: FlagVisualValue;
   readonly tone: GuessFlagPromptTone;
 };
 
@@ -35,23 +36,11 @@ export function GuessFlagPrompt({ visual, tone }: GuessFlagPromptProps) {
       >
         Qual é esta bandeira?
       </Text>
-      {visual.type === 'emoji' ? (
-        <Text
-          style={styles.emoji}
-          accessible={false}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          {visual.value}
-        </Text>
-      ) : (
-        <Image
-          source={visual.source}
-          style={styles.asset}
-          resizeMode="contain"
-          accessible={false}
-        />
-      )}
+      <FlagVisual
+        visual={visual}
+        style={visual.type === 'emoji' ? styles.emojiContainer : styles.asset}
+        emojiStyle={styles.emoji}
+      />
     </Animated.View>
   );
 }
@@ -73,6 +62,11 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 88,
+    lineHeight: 104,
+  },
+  emojiContainer: {
+    width: 150,
+    height: 104,
   },
   asset: {
     width: 150,

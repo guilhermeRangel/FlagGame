@@ -6,10 +6,11 @@ Flag World é um jogo mobile em React Native + Expo criado para explorar bandeir
 
 - **Bandeiras Giratórias:** toque em cada bandeira até quatro vezes; ao esgotar os giros, o card fica indisponível.
 - **Qual é a Bandeira?:** escolha uma dificuldade e identifique o país correto entre três alternativas em uma partida de dez rodadas, com pontuação, bônus de sequência, feedback visual/sonoro e resultado final.
+- **Encontre a Bandeira:** leia o nome do país, território ou entidade e escolha sua bandeira entre três cards visuais. Os nomes das alternativas são revelados depois da resposta.
 
 ## Dificuldades do quiz
 
-O jogo **Qual é a Bandeira?** possui quatro níveis editoriais calibrados para o público brasileiro. A classificação pertence somente a essa feature e não altera o catálogo global nem o jogo Bandeiras Giratórias.
+Os jogos **Qual é a Bandeira?** e **Encontre a Bandeira** usam os mesmos quatro níveis editoriais calibrados para o público brasileiro. A classificação pertence ao núcleo compartilhado dos quizzes e não altera o catálogo global nem o jogo Bandeiras Giratórias.
 
 | Nível        | Curadoria                                                 | Distribuição em 10 rodadas                       | Multiplicador |
 | ------------ | --------------------------------------------------------- | ------------------------------------------------ | ------------- |
@@ -29,7 +30,9 @@ Cada acerto vale 100 pontos. A partir do terceiro acerto consecutivo, passa a va
 | Difícil      |           160 |                    200 |
 | Especialista |           200 |                    250 |
 
-Ao terminar, **Jogar novamente** preserva o nível, **Trocar dificuldade** retorna ao seletor e **Voltar aos jogos** retorna à lista. Durante uma partida, voltar abandona a rodada atual e retorna ao seletor; a partir do seletor, voltar retorna à lista de jogos.
+Ao terminar qualquer um dos quizzes, **Jogar novamente** preserva o nível, **Trocar dificuldade** retorna ao seletor e **Voltar aos jogos** retorna à lista. Durante uma partida, voltar abandona a rodada atual e retorna ao seletor; a partir do seletor, voltar retorna à lista de jogos.
+
+As respostas usam três opções da mesma faixa intrínseca. Imagens exatamente equivalentes — Clipperton/França/São Martinho e Noruega/Svalbard e Jan Mayen — nunca aparecem juntas nem se repetem como resposta correta na mesma partida.
 
 ## DEMO
 
@@ -75,15 +78,16 @@ src/
   app/
   features/
     flag-game/
+    find-flag-game/
     guess-flag-game/
-      data/
   shared/
     domain/flags/
+    gameplay/flag-quiz/
 docs/
   handoffs/
 ```
 
-Cada jogo deve permanecer isolado em sua própria feature. Conceitos realmente globais, como o tipo e o catálogo de bandeiras, ficam em `src/shared/domain/flags/`. A pasta `docs/handoffs/` mantém o histórico das sessões que alteram comportamento, arquitetura ou navegação.
+Cada modalidade mantém tela e apresentação próprias em sua feature. O tipo e o catálogo ficam em `src/shared/domain/flags/`, enquanto as regras reutilizadas pelos dois quizzes ficam em `src/shared/gameplay/flag-quiz/`. A pasta `docs/handoffs/` mantém o histórico das sessões que alteram comportamento, arquitetura ou navegação.
 
 ## Adicionar uma nova bandeira
 
@@ -103,7 +107,7 @@ Cada jogo deve permanecer isolado em sua própria feature. Conceitos realmente g
 
 O botão da tela Welcome reproduz e pausa o tema local `src/shared/assets/audio/welcome-theme.wav`. O player usa `expo-audio`, compatível com o Expo Go do SDK 54.
 
-O jogo Qual é a Bandeira? usa três efeitos locais em `src/shared/assets/audio/game-effects/`:
+Os dois quizzes usam três efeitos locais em `src/shared/assets/audio/game-effects/`:
 
 - `correct-answer.wav`
 - `incorrect-answer.wav`
@@ -116,13 +120,13 @@ node scripts/generate-welcome-theme.mjs
 node scripts/generate-game-effects.mjs
 ```
 
-Para substituir ou adicionar efeitos, mantenha arquivos WAV válidos, importe-os estaticamente no hook de áudio da feature e preserve o fallback que impede falhas de áudio de interromper a partida. Não use `expo-av`.
+Para substituir ou adicionar efeitos, mantenha arquivos WAV válidos, importe-os estaticamente no hook compartilhado de áudio e preserve o fallback que impede falhas de áudio de interromper a partida. Não use `expo-av`.
 
 ## Catálogo de bandeiras
 
-O catálogo possui 262 bandeiras RGI do Unicode Emoji 17.0: 259 de países/regiões e as bandeiras de Inglaterra, Escócia e País de Gales. No jogo Bandeiras Giratórias, 30 bandeiras são sorteadas ao iniciar ou tocar em Sortear novamente; no quiz, uma bandeira é exibida em cada uma das dez rodadas conforme a distribuição da dificuldade escolhida.
+O catálogo possui 262 bandeiras RGI do Unicode Emoji 17.0: 259 de países/regiões e as bandeiras de Inglaterra, Escócia e País de Gales. No jogo Bandeiras Giratórias, 30 bandeiras são sorteadas ao iniciar ou tocar em Sortear novamente; nos quizzes, uma bandeira é usada como pergunta ou alternativa em cada uma das dez rodadas conforme a distribuição da dificuldade escolhida.
 
-A curadoria do quiz fica em `src/features/guess-flag-game/data/flag-difficulty.data.ts`. Ao alterar o catálogo compartilhado, atualize também essa classificação. Um validador da feature verifica quantidade, IDs duplicados, IDs desconhecidos e bandeiras sem nível.
+A curadoria fica em `src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts`. Ao alterar o catálogo compartilhado, atualize também essa classificação e os grupos de equivalência visual quando necessário. O validador do núcleo verifica quantidade, IDs duplicados, IDs desconhecidos e bandeiras sem nível.
 
 O arquivo pode ser regenerado a partir do `emoji-test.txt` oficial:
 
@@ -145,5 +149,5 @@ As bandeiras são imagens PNG locais do [Twemoji](https://github.com/jdecked/twe
 ## Limitações desta versão
 
 - As bandeiras seguem o estilo visual do Twemoji, que pode diferir do emoji nativo do aparelho.
-- O jogo ainda não possui cronômetro nem persistência de melhor pontuação.
+- Os quizzes ainda não possuem cronômetro nem persistência de melhor pontuação.
 - A dificuldade representa familiaridade estimada para o público brasileiro e deve evoluir por curadoria e feedback, não por uma métrica universal de países.

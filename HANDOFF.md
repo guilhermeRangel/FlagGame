@@ -26,29 +26,26 @@ Welcome
   ├── Information
   └── Game Selection
         ├── Bandeiras Giratórias → Flag Game
-        └── Qual é a Bandeira?  → Seleção de dificuldade
-                                      ↓
-                                  Guess Flag Game
-                                      ↓
-                                    Resultado
+        ├── Qual é a Bandeira?  → Seleção de dificuldade → Guess Flag Game → Resultado
+        └── Encontre a Bandeira → Seleção de dificuldade → Find Flag Game  → Resultado
 ```
 
 - `Welcome → Game Selection` usa `navigate`, preservando a tela anterior.
 - A seleção navega pela rota armazenada nos dados do item, sem comparação por índice.
 - Bandeiras Giratórias usa `navigation.goBack()` para retornar à seleção de jogos.
-- No quiz, voltar durante uma partida ou no resultado abandona a partida e retorna ao seletor de dificuldade; voltar a partir do seletor retorna à seleção de jogos. O bloqueio do gesto/botão nativo segue a mesma regra por `usePreventRemove`.
-- Jogar novamente no quiz reinicia o reducer local no mesmo nível; não empilha uma segunda tela.
+- Nos quizzes, voltar durante uma partida ou no resultado abandona a partida e retorna ao seletor de dificuldade; voltar a partir do seletor retorna à seleção de jogos. O bloqueio do gesto/botão nativo segue a mesma regra por `usePreventRemove`.
+- Jogar novamente reinicia o reducer compartilhado no mesmo nível; não empilha uma segunda tela.
 - A fonte canônica das rotas é [src/shared/constants/routes.ts](src/shared/constants/routes.ts). O diretório legado `src/app/routes/` não possui consumidores e não deve virar uma segunda fonte de verdade.
 
 ## Estado confirmado do aplicativo
 
 - Welcome com tema musical local, controlado pelo botão Música/Silencioso.
 - A música é pausada quando Welcome perde o foco, evitando sobreposição com os efeitos dos jogos.
-- Information, Game Selection, Flag Game e Guess Flag Game usam 32 px de padding horizontal.
-- Game Selection possui dez opções: duas disponíveis e oito marcadas como “Em breve”.
-- Game Selection e os dois jogos solicitam orientação `PORTRAIT` pelo hook compartilhado.
+- Information, Game Selection, Flag Game e Guess Flag Game usam 32 px de padding horizontal; Find Flag Game usa 24 px.
+- Game Selection possui dez opções: três disponíveis e sete marcadas como “Em breve”.
+- Game Selection e os três jogos solicitam orientação `PORTRAIT` pelo hook compartilhado.
 - Catálogo compartilhado com 262 bandeiras RGI do Unicode Emoji 17.0, renderizadas por PNGs locais do Twemoji.
-- O quiz possui quatro dificuldades editoriais e classifica as 262 bandeiras exatamente uma vez: 43 fáceis, 90 médias, 70 difíceis e 59 especialistas.
+- Os dois quizzes compartilham quatro dificuldades editoriais e classificam as 262 bandeiras exatamente uma vez: 43 fáceis, 90 médias, 70 difíceis e 59 especialistas.
 - O aplicativo não depende mais da fonte de emojis do sistema para mostrar bandeiras.
 - O domínio global `Flag`, `FlagVisual` e `FLAG_OPTIONS` fica em `src/shared/domain/flags/`.
 
@@ -63,16 +60,16 @@ Welcome
 
 ## Jogo 2 — Qual é a Bandeira?
 
-- Feature independente em `src/features/guess-flag-game/`.
+- Tela e componentes específicos em `src/features/guess-flag-game/`, consumindo o núcleo neutro `src/shared/gameplay/flag-quiz/`.
 - A entrada da rota mostra primeiro quatro cards acessíveis: Fácil, Médio, Difícil e Especialista.
 - Dez rodadas por partida e três alternativas por rodada.
-- As dez bandeiras corretas são diferentes dentro da mesma partida.
-- Alternativas não repetem ID/nome, incluem exatamente uma correta e têm posição embaralhada.
+- As dez bandeiras corretas possuem IDs e identidades visuais diferentes dentro da mesma partida.
+- Alternativas não repetem ID, nome ou identidade visual, incluem exatamente uma correta e têm posição embaralhada.
 - A geração usa Fisher–Yates imutável e aceita uma fonte aleatória opcional para validação determinística.
 
 ### Classificação editorial
 
-`GuessFlagDifficulty` possui os valores `easy`, `medium`, `hard` e `expert`. A curadoria está em `flag-difficulty.data.ts` dentro da feature, porque familiaridade é uma regra subjetiva do quiz, não uma propriedade global de `Flag`.
+`FlagQuizDifficulty` possui os valores `easy`, `medium`, `hard` e `expert`. A curadoria está no núcleo compartilhado dos quizzes, porque familiaridade é uma regra subjetiva de gameplay, não uma propriedade global de `Flag`.
 
 | Nível        | Quantidade | Critério                                         | Exemplos                      |
 | ------------ | ---------: | ------------------------------------------------ | ----------------------------- |
@@ -83,6 +80,7 @@ Welcome
 
 - Cada um dos 262 IDs aparece exatamente uma vez.
 - O validador puro informa duplicações, IDs desconhecidos e IDs não classificados; em desenvolvimento, o módulo do hook executa a asserção contra `FLAG_OPTIONS` ao ser carregado.
+- `FLAG_VISUAL_EQUIVALENCE_GROUPS` registra os assets comprovadamente idênticos: `cp/fr/mf` e `no/sj`. Essas identidades não se repetem nas alternativas ou respostas corretas de uma partida.
 - Mudanças no catálogo compartilhado exigem atualização explícita da curadoria. Não existe API ou consulta de rede em runtime.
 
 ### Distribuição acumulada e alternativas
@@ -101,7 +99,7 @@ Welcome
 
 ### Estado e transições
 
-O hook `useGuessFlagGame` possui um reducer coeso com:
+O hook `useFlagQuizGame` possui um reducer coeso com:
 
 - `rounds`, índice atual e `gameId`;
 - score, acertos, erros, sequência e melhor sequência;
@@ -117,7 +115,7 @@ selecting-difficulty
 playing
   ↓ primeira resposta válida
 showing-feedback
-  ↓ 1200 ms (timer com cleanup)
+  ↓ duração configurável (1200 ms neste jogo; timer com cleanup)
 playing na próxima rodada
   ↓ última rodada
 finished
@@ -151,7 +149,7 @@ O reducer calcula `Math.round((100 + bônus) × multiplicador)`. O bônus é zer
 - O seletor usa quatro cards em coluna com descrição, exemplos, multiplicador, feedback de toque e rótulo completo para leitor de tela.
 - HUD compacto com dificuldade, multiplicador, rodada, score, acertos e sequência.
 - Prompt local com entrada suave; não reutiliza a animação infinita do primeiro jogo.
-- A abstração visual renderiza emoji ou asset real nos dois jogos; o catálogo atual usa assets locais para evitar glifos `?` em runtimes sem suporte adequado.
+- `FlagVisual` renderiza emoji ou asset real nos dois quizzes; o catálogo atual usa assets locais para evitar glifos `?` em runtimes sem suporte adequado.
 - Opções possuem estados puros `idle`, `correct`, `incorrect` e `disabled`.
 - Acerto usa verde + ✓ + texto; erro usa vermelho + ✕ + texto, sem depender só de cor.
 - O leitor de tela não recebe o nome da bandeira antes da resposta, pois isso entregaria a solução.
@@ -165,10 +163,20 @@ O reducer calcula `Math.round((100 + bônus) × multiplicador)`. O bônus é zer
   - `correct-answer.wav`;
   - `incorrect-answer.wav`;
   - `game-finished.wav`.
-- `useGuessFlagGameSounds` possui três players estáticos de `expo-audio`.
+- `useFlagQuizGameSounds` possui três players estáticos de `expo-audio` compartilhados pelas duas modalidades.
 - Cada reprodução pausa os demais players, volta ao início e usa proteção contra corridas/unmount.
 - Falhas de áudio são absorvidas e nunca interrompem o jogo.
 - `useAudioPlayer` libera os recursos ao desmontar; não chamar `remove()` manualmente nesses players.
+
+## Jogo 3 — Encontre a Bandeira
+
+- Feature específica em `src/features/find-flag-game/` e rota tipada `FindFlagGame`.
+- Usa o mesmo seletor, classificação, gerador, pontuação, reducer, HUD, feedback, resultado e sons do segundo jogo.
+- Cada rodada mostra “Escolha a bandeira correta”, o nome da entidade em destaque e três cards de bandeira empilhados com padding lateral de 24 px.
+- Antes da resposta, os cards não expõem o nome pelo texto nem pelo leitor de tela; o label acessível identifica apenas a posição da opção.
+- Após a resposta, os três nomes são revelados, a correta fica verde com ✓, a selecionada incorreta fica vermelha com ✕ e as demais ficam desabilitadas com texto explícito.
+- O feedback permanece por 1800 ms para permitir a leitura das bandeiras e nomes; a tela rola até ele e volta ao topo na rodada seguinte.
+- Prompt e cards são específicos desta modalidade; não existe uma tela única com render props para os dois sentidos do quiz.
 
 ## Estrutura principal
 
@@ -177,19 +185,24 @@ src/
   app/navigation/
   features/
     flag-game/
+    find-flag-game/
+      components/
+      screens/
     game-selection/
     guess-flag-game/
       components/
-      constants/
-      data/
-      hooks/
       screens/
-      types/
-      utils/
   shared/
     assets/audio/
     components/
     domain/flags/
+    gameplay/flag-quiz/
+      components/
+      constants/
+      data/
+      hooks/
+      types/
+      utils/
     hooks/
     theme/
     types/
@@ -208,14 +221,13 @@ scripts/
 - [src/shared/assets/flags](src/shared/assets/flags): 262 imagens locais e atribuição do Twemoji.
 - [src/shared/domain/flags/types.ts](src/shared/domain/flags/types.ts): domínio neutro, sem dependência de React Native.
 - [src/features/flag-game/screens/FlagGameScreen.tsx](src/features/flag-game/screens/FlagGameScreen.tsx): primeiro jogo.
-- [src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx](src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx): composição da tela do quiz.
-- [src/features/guess-flag-game/components/GuessFlagDifficultySelector/GuessFlagDifficultySelector.tsx](src/features/guess-flag-game/components/GuessFlagDifficultySelector/GuessFlagDifficultySelector.tsx): seletor acessível com os quatro níveis.
-- [src/features/guess-flag-game/constants/guessFlagGame.constants.ts](src/features/guess-flag-game/constants/guessFlagGame.constants.ts): configuração central de labels, multiplicadores e distribuição.
-- [src/features/guess-flag-game/data/flag-difficulty.data.ts](src/features/guess-flag-game/data/flag-difficulty.data.ts): curadoria explícita dos 262 IDs.
-- [src/features/guess-flag-game/hooks/useGuessFlagGame.ts](src/features/guess-flag-game/hooks/useGuessFlagGame.ts): reducer e lifecycle da partida.
-- [src/features/guess-flag-game/hooks/useGuessFlagGameSounds.ts](src/features/guess-flag-game/hooks/useGuessFlagGameSounds.ts): efeitos sem expor players à tela.
-- [src/features/guess-flag-game/utils/createGuessFlagGameQuestions.ts](src/features/guess-flag-game/utils/createGuessFlagGameQuestions.ts): geração pura das perguntas.
-- [src/features/guess-flag-game/utils/validateFlagDifficultyClassification.ts](src/features/guess-flag-game/utils/validateFlagDifficultyClassification.ts): cobertura, duplicações e integridade da curadoria.
+- [src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx](src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx): composição específica do quiz bandeira → nome.
+- [src/features/find-flag-game/screens/FindFlagGameScreen.tsx](src/features/find-flag-game/screens/FindFlagGameScreen.tsx): composição específica do quiz nome → bandeira.
+- [src/shared/gameplay/flag-quiz/index.ts](src/shared/gameplay/flag-quiz/index.ts): API pública do núcleo compartilhado.
+- [src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts](src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts): curadoria explícita dos 262 IDs.
+- [src/shared/gameplay/flag-quiz/hooks/useFlagQuizGame.ts](src/shared/gameplay/flag-quiz/hooks/useFlagQuizGame.ts): reducer, geração e lifecycle configurável da partida.
+- [src/shared/gameplay/flag-quiz/utils/createFlagQuizQuestions.ts](src/shared/gameplay/flag-quiz/utils/createFlagQuizQuestions.ts): geração pura, distribuição e identidade visual.
+- [src/shared/gameplay/flag-quiz/utils/validateFlagDifficultyClassification.ts](src/shared/gameplay/flag-quiz/utils/validateFlagDifficultyClassification.ts): cobertura, duplicações e integridade da curadoria.
 - [scripts/generate-flags-data.mjs](scripts/generate-flags-data.mjs): regenera o catálogo compartilhado.
 - [scripts/download-flag-assets.mjs](scripts/download-flag-assets.mjs): baixa/valida os PNGs e regenera o mapa estático.
 - [scripts/generate-welcome-theme.mjs](scripts/generate-welcome-theme.mjs): regenera o tema da Welcome.
@@ -223,12 +235,13 @@ scripts/
 - [docs/handoffs/2026-08-01-guess-flag-game.md](docs/handoffs/2026-08-01-guess-flag-game.md): detalhes da sessão do segundo jogo.
 - [docs/handoffs/2026-08-01-local-flag-assets.md](docs/handoffs/2026-08-01-local-flag-assets.md): migração de emojis para imagens locais.
 - [docs/handoffs/2026-08-01-guess-flag-difficulty.md](docs/handoffs/2026-08-01-guess-flag-difficulty.md): implementação das quatro dificuldades.
+- [docs/handoffs/2026-08-01-find-flag-game.md](docs/handoffs/2026-08-01-find-flag-game.md): terceira modalidade e extração do núcleo compartilhado.
 
 ## Decisões arquiteturais
 
-- Compartilhar apenas o domínio real de bandeiras; não mover rotação ou componentes do primeiro jogo para `shared`.
-- Manter as regras do quiz independentes de React Native e da feature `flag-game`.
-- Manter dificuldade dentro do quiz e não adicionar esse campo ao domínio global `Flag`.
+- Compartilhar o domínio real de bandeiras e o núcleo dos dois quizzes; rotação e componentes do primeiro jogo permanecem exclusivos de `flag-game`.
+- Manter as regras puras dos quizzes independentes de React Native e da feature `flag-game`.
+- Manter dificuldade dentro de `shared/gameplay/flag-quiz` e não adicionar esse campo ao domínio global `Flag`.
 - Usar uma classificação editorial, explícita e revisável para o público brasileiro em vez de derivação por população ou API externa.
 - Usar reducer em vez de vários `useState` desconectados.
 - Gerar toda a partida uma única vez ao iniciar/reiniciar.
@@ -271,6 +284,22 @@ Não foi possível percorrer o fluxo inteiro por toques no simulador: não havia
 - [x] Fluxo no Expo Go do emulador Android: quatro cards, Fácil/Especialista, bandeiras locais, acerto, erro, duas partidas completas, resultado, reinício, troca, saída e botão nativo Voltar.
 - [ ] Aparelho físico: não havia hardware conectado; validar QR Code, áudio, gestos e layout em Android/iOS reais.
 
+### Validações da etapa “Encontre a Bandeira”
+
+- [x] A referência versionada do Expo 57 exigida por `AGENTS.md` foi consultada antes das alterações; o projeto permaneceu no SDK 54/React Native 0.81.
+- [x] Classificação compartilhada: 262/262 IDs, contagens 43/90/70/59, sem duplicados, desconhecidos ou ausentes.
+- [x] Harness independente: 400 partidas, 100 seeds por nível, confirmaram as quatro distribuições, dez respostas com identidade visual única, três opções da mesma faixa e resposta correta presente.
+- [x] Hashes dos 262 PNGs confirmaram somente duas famílias exatamente equivalentes: `cp/fr/mf` e `no/sj`; ambas são bloqueadas pelo gerador.
+- [x] Pontuação, bônus, reset de sequência, bloqueio de toque duplo, reducer, timer/cleanup e catálogo reduzido foram revalidados.
+- [x] `npx tsc --noEmit --incremental false`, ESLint completo e Prettier passaram; o lint manteve apenas o aviso de depreciação da configuração legada.
+- [x] `npx expo-doctor@latest`: 18/18 verificações passaram com acesso à rede.
+- [x] `npx expo install --check` usou o mapa local e informou dependências atualizadas, mas avisou que a checagem era menos confiável por estar offline.
+- [x] Bundles Hermes Android e iOS por `npx expo export` concluíram, incluindo os 262 PNGs e os efeitos locais.
+- [x] Expo Go no emulador Android: terceiro card, seletor completo, partida Fácil, três cards com assets reais, acerto, erro, bloqueio visual, nomes revelados, feedback de 1800 ms, auto-scroll, dez rodadas, resultado, reinício e retorno em duas etapas.
+- [x] Regressão do segundo jogo no Android: seletor, HUD, prompt com PNG e três opções textuais continuaram renderizando normalmente após a migração.
+- [x] O Expo Go abriu no simulador iOS e o bundle iOS foi gerado, mas o fluxo da terceira modalidade não foi percorrido por toques nesse simulador.
+- [ ] TalkBack, VoiceOver, qualidade/volume dos sons e aparelho físico por QR Code continuam pendentes.
+
 ## Limitações e observações conhecidas
 
 - Os gráficos de bandeira são do Twemoji e usam licença CC BY 4.0; preserve a atribuição no README ao redistribuí-los.
@@ -278,9 +307,9 @@ Não foi possível percorrer o fluxo inteiro por toques no simulador: não havia
 - `adb shell monkey -p <pkg> -c android.intent.category.LAUNCHER 1` injeta um toque aleatório além de abrir o app; para um relaunch previsível, prefira `force-stop` seguido de `adb shell am start -n <pkg>/<activity>`.
 - Reabrir por deep link pode restaurar a última tela e remontar telas anteriores, provocando disputa entre locks de orientação. Para validar orientação, navegue manualmente a partir de estado limpo.
 - A dificuldade é uma estimativa editorial de familiaridade para o público brasileiro; ela pode precisar de ajustes com feedback real de jogadores.
-- O quiz ainda não possui cronômetro, persistência de score ou ranking.
-- A implementação passou nas validações automatizadas, bundles e fluxo completo no emulador Android; falta apenas repetir a checagem em aparelho físico.
-- O randomizador legado do primeiro jogo ainda usa `sort` aleatório; o quiz já usa Fisher–Yates.
+- Os quizzes ainda não possuem cronômetro, persistência de score ou ranking.
+- A terceira modalidade passou nas validações automatizadas, bundles e fluxo completo no emulador Android; falta repetir a checagem em aparelho físico e percorrer sua UI no iOS.
+- O randomizador legado do primeiro jogo ainda usa `sort` aleatório; os quizzes usam Fisher–Yates.
 - `src/app/routes/` é legado e não utilizado. Evite importar dele.
 
 ## Regras para próximas sessões
@@ -307,7 +336,7 @@ node scripts/download-flag-assets.mjs
 
 ## Próximas prioridades recomendadas
 
-1. Fazer teste manual em aparelho físico: escolher cada nível e percorrer ao menos uma partida completa, reinício, troca de dificuldade e voltar.
+1. Fazer teste manual em aparelho físico: percorrer os dois quizzes por QR Code, incluindo todos os níveis, reinício, troca de dificuldade e voltar.
 2. Confirmar volume, distinção dos três efeitos, VoiceOver e TalkBack em Android/iOS físicos.
 3. Coletar feedback de jogadores brasileiros e revisar a curadoria editorial quando houver evidência.
 4. Considerar persistência de melhor pontuação por dificuldade sem acoplar storage à tela.

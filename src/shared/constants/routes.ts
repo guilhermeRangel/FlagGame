@@ -5,4 +5,5 @@ export const ROUTES = {
   GAME_SELECTION: 'GameSelection',
   FLAG_GAME: 'FlagGame',
   GUESS_FLAG_GAME: 'GuessFlagGame',
+  FIND_FLAG_GAME: 'FindFlagGame',
 } as const;

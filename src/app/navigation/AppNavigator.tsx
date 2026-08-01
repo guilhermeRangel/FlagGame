@@ -6,6 +6,7 @@ import { InformationScreen } from '@/features/information/screens/InformationScr
 import { GameSelectionScreen } from '@/features/game-selection/screens/GameSelectionScreen';
 import { FlagGameScreen } from '@/features/flag-game/screens/FlagGameScreen';
 import { GuessFlagGameScreen } from '@/features/guess-flag-game/screens/GuessFlagGameScreen';
+import { FindFlagGameScreen } from '@/features/find-flag-game/screens/FindFlagGameScreen';
 import type { RootStackParamList } from '@/shared/types/navigation';
 import { ROUTES } from '@/shared/constants/routes';
 
@@ -21,6 +22,7 @@ export function AppNavigator() {
         <Stack.Screen name={ROUTES.GAME_SELECTION} component={GameSelectionScreen} />
         <Stack.Screen name={ROUTES.FLAG_GAME} component={FlagGameScreen} />
         <Stack.Screen name={ROUTES.GUESS_FLAG_GAME} component={GuessFlagGameScreen} />
+        <Stack.Screen name={ROUTES.FIND_FLAG_GAME} component={FindFlagGameScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

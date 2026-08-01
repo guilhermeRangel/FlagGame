@@ -17,11 +17,11 @@ export const GAME_OPTIONS: GameOption[] = [
     isAvailable: true,
   },
   {
-    id: 'discover-country',
-    title: 'Descubra o País',
-    description: 'Em breve você poderá descobrir países pelo desenho.',
-    isAvailable: false,
-    badge: 'Em breve',
+    id: 'find-flag',
+    title: 'Encontre a Bandeira',
+    description: 'Leia o nome e escolha a bandeira correta.',
+    route: ROUTES.FIND_FLAG_GAME,
+    isAvailable: true,
   },
   {
     id: 'memory',

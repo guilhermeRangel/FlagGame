@@ -1,0 +1,1 @@
+export { FlagQuizGameResult } from './FlagQuizGameResult';

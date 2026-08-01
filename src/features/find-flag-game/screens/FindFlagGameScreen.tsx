@@ -2,16 +2,14 @@ import { useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { ScreenContainer } from '@/shared/components/ScreenContainer';
-import { Header } from '@/shared/components/Header';
-import { EmptyState } from '@/shared/components/EmptyState';
 import { AppButton } from '@/shared/components/AppButton';
-import { spacing } from '@/shared/theme';
-import { useScreenOrientation } from '@/shared/hooks/useScreenOrientation';
-import type { AppNavigationProp } from '@/shared/types/navigation';
-import { GuessFlagPrompt } from '@/features/guess-flag-game/components/GuessFlagPrompt';
-import { GuessFlagOptionButton } from '@/features/guess-flag-game/components/GuessFlagOptionButton';
+import { EmptyState } from '@/shared/components/EmptyState';
+import { Header } from '@/shared/components/Header';
+import { ScreenContainer } from '@/shared/components/ScreenContainer';
+import { FLAG_OPTIONS } from '@/shared/domain/flags';
 import {
+  FLAG_QUIZ_OPTION_COUNT,
+  FLAG_QUIZ_TOTAL_ROUNDS,
   FlagQuizDifficultySelector,
   FlagQuizFeedback,
   FlagQuizGameHud,
@@ -20,17 +18,23 @@ import {
   useFlagQuizGame,
   useFlagQuizGameSounds,
 } from '@/shared/gameplay/flag-quiz';
+import { useScreenOrientation } from '@/shared/hooks/useScreenOrientation';
+import { spacing } from '@/shared/theme';
+import type { AppNavigationProp } from '@/shared/types/navigation';
+import { FindFlagOptionCard } from '@/features/find-flag-game/components/FindFlagOptionCard';
+import { FindFlagPrompt } from '@/features/find-flag-game/components/FindFlagPrompt';
 
-export function GuessFlagGameScreen() {
+const FIND_FLAG_FEEDBACK_DURATION_MS = 1_800;
+
+export function FindFlagGameScreen() {
   const navigation = useNavigation<AppNavigationProp>();
-  const {
-    state,
-    currentRound,
-    answerCurrentRound,
-    selectDifficulty,
-    restartGame,
-    changeDifficulty,
-  } = useFlagQuizGame();
+  const { state, currentRound, submitAnswer, selectDifficulty, restartGame, changeDifficulty } =
+    useFlagQuizGame({
+      flags: FLAG_OPTIONS,
+      totalRounds: FLAG_QUIZ_TOTAL_ROUNDS,
+      optionCount: FLAG_QUIZ_OPTION_COUNT,
+      feedbackDurationMs: FIND_FLAG_FEEDBACK_DURATION_MS,
+    });
   const { playAnswerFeedback, playGameFinished } = useFlagQuizGameSounds();
   const shouldReturnToGameList = useRef(false);
   const gameScrollView = useRef<ScrollView>(null);
@@ -94,7 +98,7 @@ export function GuessFlagGameScreen() {
   if (state.status === 'selecting-difficulty' || !state.difficulty) {
     return (
       <ScreenContainer style={styles.container}>
-        <Header title="Qual é a Bandeira?" onBack={handleHeaderBack} />
+        <Header title="Encontre a Bandeira" onBack={handleHeaderBack} />
         <ScrollView
           contentContainerStyle={styles.selectionContent}
           showsVerticalScrollIndicator={false}
@@ -108,7 +112,7 @@ export function GuessFlagGameScreen() {
   if (state.status === 'unavailable' || (!currentRound && state.status !== 'finished')) {
     return (
       <ScreenContainer style={styles.container}>
-        <Header title="Qual é a Bandeira?" onBack={handleHeaderBack} />
+        <Header title="Encontre a Bandeira" onBack={handleHeaderBack} />
         <View style={styles.emptyContainer}>
           <EmptyState
             title="Não foi possível carregar as bandeiras."
@@ -124,7 +128,7 @@ export function GuessFlagGameScreen() {
   if (state.status === 'finished') {
     return (
       <ScreenContainer style={styles.container}>
-        <Header title="Qual é a Bandeira?" onBack={handleHeaderBack} />
+        <Header title="Encontre a Bandeira" onBack={handleHeaderBack} />
         <ScrollView
           contentContainerStyle={styles.resultContent}
           showsVerticalScrollIndicator={false}
@@ -153,10 +157,11 @@ export function GuessFlagGameScreen() {
       ? 'correct'
       : 'incorrect'
     : 'neutral';
+  const shouldRevealAnswers = state.status === 'showing-feedback';
 
   return (
     <ScreenContainer style={styles.container}>
-      <Header title="Qual é a Bandeira?" onBack={handleHeaderBack} />
+      <Header title="Encontre a Bandeira" onBack={handleHeaderBack} />
       <ScrollView
         ref={gameScrollView}
         contentContainerStyle={styles.content}
@@ -171,17 +176,19 @@ export function GuessFlagGameScreen() {
           streak={state.streak}
         />
 
-        <GuessFlagPrompt
+        <FindFlagPrompt
           key={`prompt:${state.gameId}:${currentRound.id}`}
-          visual={currentRound.correctFlag.visual}
+          countryName={currentRound.correctFlag.countryName}
           tone={promptTone}
         />
 
         <View style={styles.options}>
-          {currentRound.options.map((option) => (
-            <GuessFlagOptionButton
+          {currentRound.options.map((option, index) => (
+            <FindFlagOptionCard
               key={option.id}
               option={option}
+              position={index + 1}
+              optionCount={currentRound.options.length}
               state={getFlagQuizOptionState(
                 option.id,
                 state.selectedOptionId,
@@ -189,13 +196,22 @@ export function GuessFlagGameScreen() {
                 state.status,
               )}
               isSelected={state.selectedOptionId === option.id}
-              onPress={answerCurrentRound}
+              revealName={shouldRevealAnswers}
+              onPress={submitAnswer}
             />
           ))}
         </View>
 
         {state.feedback ? (
-          <FlagQuizFeedback key={`feedback:${state.feedback.id}`} feedback={state.feedback} />
+          <FlagQuizFeedback
+            key={`feedback:${state.feedback.id}`}
+            feedback={state.feedback}
+            detail={
+              state.feedback.isCorrect
+                ? `+${state.feedback.pointsAwarded} pontos`
+                : `Resposta correta: ${state.feedback.correctFlag.countryName}. A opção está destacada em verde.`
+            }
+          />
         ) : null}
       </ScrollView>
     </ScreenContainer>
@@ -204,7 +220,7 @@ export function GuessFlagGameScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.lg,
   },
   content: {
     flexGrow: 1,
@@ -219,6 +235,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   options: {
+    width: '100%',
     gap: spacing.sm,
   },
   emptyContainer: {

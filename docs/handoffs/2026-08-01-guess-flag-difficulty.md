@@ -2,6 +2,8 @@
 
 Data: 2026-08-01
 
+> Atualização posterior: a classificação, o gerador, o reducer, os sons e os componentes comuns foram movidos para `src/shared/gameplay/flag-quiz/` ao implementar “Encontre a Bandeira”. Consulte `docs/handoffs/2026-08-01-find-flag-game.md` para o estado atual.
+
 ## Objetivo
 
 Adicionar ao quiz uma escolha inicial entre Fácil, Médio, Difícil e Especialista, com curadoria explícita para o público brasileiro, distribuição acumulada de bandeiras e pontuação proporcional ao desafio. A dificuldade permanece exclusiva de `guess-flag-game`; o domínio global de bandeiras e o jogo Bandeiras Giratórias não são alterados por essa classificação.

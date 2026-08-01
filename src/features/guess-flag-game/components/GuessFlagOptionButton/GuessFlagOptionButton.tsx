@@ -1,22 +1,22 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
-import type { GuessFlagOption, GuessFlagOptionState } from '@/features/guess-flag-game/types';
+import type { FlagQuizChoice, FlagQuizOptionState } from '@/shared/gameplay/flag-quiz';
 
 type GuessFlagOptionButtonProps = {
-  readonly option: GuessFlagOption;
-  readonly state: GuessFlagOptionState;
+  readonly option: FlagQuizChoice;
+  readonly state: FlagQuizOptionState;
   readonly isSelected: boolean;
   readonly onPress: (optionId: string) => void;
 };
 
-const STATE_LABELS: Record<GuessFlagOptionState, string> = {
+const STATE_LABELS: Record<FlagQuizOptionState, string> = {
   idle: 'Toque para responder',
   correct: 'Resposta correta',
   incorrect: 'Resposta incorreta',
   disabled: 'Opção desabilitada',
 };
 
-const STATE_ICONS: Record<GuessFlagOptionState, string> = {
+const STATE_ICONS: Record<FlagQuizOptionState, string> = {
   idle: '•',
   correct: '✓',
   incorrect: '✕',
