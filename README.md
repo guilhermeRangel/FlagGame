@@ -2,6 +2,12 @@
 
 Flag World é um jogo mobile em React Native + Expo criado para explorar bandeiras, países e interações leves em uma primeira versão funcional.
 
+## DEMO
+
+https://github.com/user-attachments/assets/c29939c2-64c9-4300-ac6b-ac4f62b13f5e
+
+
+
 ## Requisitos
 
 - Node.js 20+
