@@ -1,7 +1,9 @@
-Adicione aqui o arquivo welcome-theme.mp3 para habilitar a música de fundo da tela de boas-vindas.
+O arquivo `welcome-theme.wav` é o tema musical local da tela de boas-vindas.
 
-A aplicação usa o caminho:
+Ele tem 12 segundos, toca em loop somente após a interação do usuário e pode ser pausado pelo botão Música/Silencioso. O player usa `expo-audio` no Expo SDK 54.
 
-src/shared/assets/audio/welcome-theme.mp3
+Para regenerar o áudio original a partir do código-fonte do sintetizador:
 
-Se o arquivo não existir, a tela entra em um fallback seguro e continua funcionando.
+```bash
+node scripts/generate-welcome-theme.mjs
+```

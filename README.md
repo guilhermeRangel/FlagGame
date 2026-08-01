@@ -18,8 +18,10 @@ npm install
 ## Execução
 
 ```bash
-npx expo start
+npx expo start --clear
 ```
+
+Abra o Expo Go 54 no aparelho físico, mantenha computador e aparelho na mesma rede e escaneie o QR Code exibido pelo terminal.
 
 ## Execução em Android
 
@@ -54,12 +56,28 @@ src/
 
 ## Áudio
 
-Adicione o arquivo welcome-theme.mp3 em src/shared/assets/audio/.
+O botão da tela Welcome reproduz e pausa o tema local `src/shared/assets/audio/welcome-theme.wav`. O player usa `expo-audio`, compatível com o Expo Go do SDK 54.
+
+Para recriar o tema original:
+
+```bash
+node scripts/generate-welcome-theme.mjs
+```
+
+## Catálogo de bandeiras
+
+O catálogo possui 262 bandeiras RGI do Unicode Emoji 17.0: 259 de países/regiões e as bandeiras de Inglaterra, Escócia e País de Gales. A cada rodada, 30 são sorteadas para manter a grade leve.
+
+O arquivo pode ser regenerado a partir do `emoji-test.txt` oficial:
+
+```bash
+node scripts/generate-flags-data.mjs /caminho/para/emoji-test.txt
+```
 
 ## Bibliotecas utilizadas
 
 - expo
-- expo-av
+- expo-audio
 - expo-screen-orientation
 - react-navigation
 - react-native-reanimated
@@ -69,4 +87,4 @@ Adicione o arquivo welcome-theme.mp3 em src/shared/assets/audio/.
 
 - A primeira versão usa emojis como representação visual das bandeiras.
 - Apenas o modo Bandeiras Giratórias está habilitado.
-- A música de fundo é opcional e usa um fallback seguro quando o arquivo de áudio não está presente.
+- A aparência de algumas bandeiras recentes depende do suporte a emojis instalado no aparelho.

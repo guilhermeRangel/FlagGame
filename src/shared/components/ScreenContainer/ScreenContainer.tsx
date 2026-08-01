@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, ViewStyle } from 'react-native';
+import { StatusBar, StyleSheet, View, ViewStyle } from 'react-native';
 import type { StatusBarStyle } from 'react-native';
-import { colors } from '@/shared/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors, spacing } from '@/shared/theme';
 
 type ScreenStatusBarStyle = StatusBarStyle | 'light' | 'dark' | 'auto';
 
@@ -35,9 +36,9 @@ export function ScreenContainer({
   const resolvedStatusBarStyle = normalizeStatusBarStyle(statusBarStyle);
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}> 
+    <SafeAreaView edges={['top', 'bottom']} style={[styles.safeArea, { backgroundColor }]}>
       <StatusBar barStyle={resolvedStatusBarStyle} backgroundColor={backgroundColor} />
-      <SafeAreaView style={[styles.container, style, { backgroundColor }]}>{children}</SafeAreaView>
+      <View style={[styles.container, style, { backgroundColor }]}>{children}</View>
     </SafeAreaView>
   );
 }
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
 });

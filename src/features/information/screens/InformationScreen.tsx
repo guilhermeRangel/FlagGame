@@ -19,7 +19,9 @@ export function InformationScreen({ navigation }: InformationScreenProps) {
         </View>
         <Text style={styles.sectionTitle}>Flag World</Text>
         <Text style={styles.bodyText}>
-          Flag World é um jogo criado para explorar bandeiras, países e curiosidades de forma leve e interativa. Nesta primeira versão, o jogador poderá selecionar diferentes modos de jogo e interagir com bandeiras animadas.
+          Flag World é um jogo criado para explorar bandeiras, países e curiosidades de forma leve e
+          interativa. Nesta primeira versão, o jogador poderá selecionar diferentes modos de jogo e
+          interagir com bandeiras animadas.
         </Text>
         <Text style={styles.sectionTitle}>Autores</Text>
         <Text style={styles.bodyText}>
@@ -27,7 +29,8 @@ export function InformationScreen({ navigation }: InformationScreenProps) {
         </Text>
         <Text style={styles.sectionTitle}>Observação</Text>
         <Text style={styles.bodyText}>
-          Esta é uma versão inicial do projeto. Novos modos de jogo, desafios e conteúdos poderão ser adicionados futuramente.
+          Esta é uma versão inicial do projeto. Novos modos de jogo, desafios e conteúdos poderão
+          ser adicionados futuramente.
         </Text>
       </ScrollView>
     </ScreenContainer>
@@ -36,7 +39,7 @@ export function InformationScreen({ navigation }: InformationScreenProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.xl,
   },
   content: {
     paddingBottom: spacing.xl,

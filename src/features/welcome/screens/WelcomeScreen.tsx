@@ -1,20 +1,40 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import type { AudioPlayer } from 'expo-audio';
 import { ScreenContainer } from '@/shared/components/ScreenContainer';
 import { AppButton } from '@/shared/components/AppButton';
 import { AnimatedFlag } from '@/shared/components/AnimatedFlag';
+import welcomeTheme from '@/shared/assets/audio/welcome-theme.wav';
 import { ROUTES } from '@/shared/constants/routes';
 import { colors, fontSizes, spacing } from '@/shared/theme';
 import type { AppNavigationProp } from '@/shared/types/navigation';
 
+function configureMusicPlayer(player: AudioPlayer) {
+  player.loop = true;
+  player.volume = 0.28;
+}
+
 export function WelcomeScreen() {
   const navigation = useNavigation<AppNavigationProp>();
-  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
+  const musicPlayer = useAudioPlayer(welcomeTheme);
+  const musicStatus = useAudioPlayerStatus(musicPlayer);
+
+  useEffect(() => {
+    configureMusicPlayer(musicPlayer);
+
+    void setAudioModeAsync({ playsInSilentMode: true }).catch(() => undefined);
+  }, [musicPlayer]);
 
   const handleMusicToggle = useCallback(() => {
-    setIsMusicEnabled((current) => !current);
-  }, []);
+    if (musicStatus.playing) {
+      musicPlayer.pause();
+      return;
+    }
+
+    musicPlayer.play();
+  }, [musicPlayer, musicStatus.playing]);
 
   const backgroundFlags = useMemo(
     () => [
@@ -30,21 +50,33 @@ export function WelcomeScreen() {
     <ScreenContainer style={styles.container}>
       <View style={styles.background}>
         {backgroundFlags.map((flag, index) => (
-          <View key={`${flag.emoji}-${index}`} style={[styles.flagBadge, { top: flag.top, left: flag.left }]}> 
+          <View
+            key={`${flag.emoji}-${index}`}
+            style={[styles.flagBadge, { top: flag.top, left: flag.left }]}
+          >
             <AnimatedFlag emoji={flag.emoji} size={44} duration={1800 + index * 400} />
           </View>
         ))}
         <View style={styles.content}>
           <Text style={styles.title}>Flag World</Text>
-          <Text style={styles.subtitle}>Prepare-se para explorar bandeiras de forma divertida.</Text>
+          <Text style={styles.subtitle}>
+            Prepare-se para explorar bandeiras de forma divertida.
+          </Text>
           <View style={styles.actions}>
-            <AppButton title="Start Game" onPress={() => navigation.navigate(ROUTES.GAME_SELECTION)} />
-            <AppButton title="Informações" variant="secondary" onPress={() => navigation.navigate(ROUTES.INFORMATION)} />
+            <AppButton
+              title="Start Game"
+              onPress={() => navigation.navigate(ROUTES.GAME_SELECTION)}
+            />
+            <AppButton
+              title="Informações"
+              variant="secondary"
+              onPress={() => navigation.navigate(ROUTES.INFORMATION)}
+            />
           </View>
         </View>
         <View style={styles.musicToggle}>
           <AppButton
-            title={isMusicEnabled ? '🔊 Música' : '🔈 Silencioso'}
+            title={musicStatus.playing ? '🔊 Música' : '🔇 Silencioso'}
             variant="secondary"
             onPress={handleMusicToggle}
           />

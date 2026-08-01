@@ -40,7 +40,7 @@ export function GameSelectionScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.xl,
   },
   subtitle: {
     color: colors.textSecondary,
