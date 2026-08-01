@@ -26,9 +26,9 @@ export const GAME_OPTIONS: GameOption[] = [
   {
     id: 'memory',
     title: 'Memória das Bandeiras',
-    description: 'Em breve você poderá testar sua memória.',
-    isAvailable: false,
-    badge: 'Em breve',
+    description: 'Encontre os pares e teste sua memória.',
+    route: ROUTES.MEMORY_GAME,
+    isAvailable: true,
   },
   {
     id: 'capitals',

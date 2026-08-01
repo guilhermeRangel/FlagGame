@@ -7,6 +7,7 @@ import { GameSelectionScreen } from '@/features/game-selection/screens/GameSelec
 import { FlagGameScreen } from '@/features/flag-game/screens/FlagGameScreen';
 import { GuessFlagGameScreen } from '@/features/guess-flag-game/screens/GuessFlagGameScreen';
 import { FindFlagGameScreen } from '@/features/find-flag-game/screens/FindFlagGameScreen';
+import { MemoryGameScreen } from '@/features/memory-game/screens/MemoryGameScreen';
 import type { RootStackParamList } from '@/shared/types/navigation';
 import { ROUTES } from '@/shared/constants/routes';
 
@@ -23,6 +24,7 @@ export function AppNavigator() {
         <Stack.Screen name={ROUTES.FLAG_GAME} component={FlagGameScreen} />
         <Stack.Screen name={ROUTES.GUESS_FLAG_GAME} component={GuessFlagGameScreen} />
         <Stack.Screen name={ROUTES.FIND_FLAG_GAME} component={FindFlagGameScreen} />
+        <Stack.Screen name={ROUTES.MEMORY_GAME} component={MemoryGameScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

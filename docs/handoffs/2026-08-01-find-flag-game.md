@@ -55,10 +55,14 @@ createFlagQuizQuestions(flags, {
 
 ## Integridade visual
 
-Os hashes dos assets mostraram imagens exatamente iguais nestes grupos:
+Uma auditoria posterior dos pixels decodificados encontrou imagens visualmente idênticas nestes grupos, inclusive em PNGs com paleta ou compressão binária diferente:
 
+- `au`, `hm`;
 - `cp`, `fr`, `mf`;
-- `no`, `sj`.
+- `dg`, `io`;
+- `ea`, `es`;
+- `no`, `sj`;
+- `um`, `us`.
 
 `FLAG_VISUAL_EQUIVALENCE_GROUPS` atribui uma identidade canônica a esses IDs. O gerador não repete identidade visual entre respostas corretas da partida nem dentro das opções da rodada. As 262 entradas continuam classificadas e disponíveis em partidas diferentes. Bandeiras apenas parecidas, como Mônaco/Indonésia e Romênia/Chade, permanecem válidas.
 

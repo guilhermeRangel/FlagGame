@@ -1,0 +1,1 @@
+export { MemoryGameResult } from './MemoryGameResult';

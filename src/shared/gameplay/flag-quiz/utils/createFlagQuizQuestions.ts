@@ -8,7 +8,7 @@ import type {
   FlagQuizDifficulty,
   FlagQuizRound,
 } from '@/shared/gameplay/flag-quiz/types';
-import { getFlagVisualIdentity } from '@/shared/gameplay/flag-quiz/utils/flagVisualIdentity';
+import { getFlagVisualIdentity } from '@/shared/domain/flags';
 import type { Flag } from '@/shared/domain/flags';
 
 export type RandomSource = () => number;

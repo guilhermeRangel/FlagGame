@@ -7,6 +7,7 @@ Flag World é um jogo mobile em React Native + Expo criado para explorar bandeir
 - **Bandeiras Giratórias:** toque em cada bandeira até quatro vezes; ao esgotar os giros, o card fica indisponível.
 - **Qual é a Bandeira?:** escolha uma dificuldade e identifique o país correto entre três alternativas em uma partida de dez rodadas, com pontuação, bônus de sequência, feedback visual/sonoro e resultado final.
 - **Encontre a Bandeira:** leia o nome do país, território ou entidade e escolha sua bandeira entre três cards visuais. Os nomes das alternativas são revelados depois da resposta.
+- **Memória das Bandeiras:** encontre pares em um tabuleiro de quatro colunas, acompanhe jogadas e sequências e escolha entre 20, 24 ou 28 cartas.
 
 ## Dificuldades do quiz
 
@@ -32,7 +33,19 @@ Cada acerto vale 100 pontos. A partir do terceiro acerto consecutivo, passa a va
 
 Ao terminar qualquer um dos quizzes, **Jogar novamente** preserva o nível, **Trocar dificuldade** retorna ao seletor e **Voltar aos jogos** retorna à lista. Durante uma partida, voltar abandona a rodada atual e retorna ao seletor; a partir do seletor, voltar retorna à lista de jogos.
 
-As respostas usam três opções da mesma faixa intrínseca. Imagens exatamente equivalentes — Clipperton/França/São Martinho e Noruega/Svalbard e Jan Mayen — nunca aparecem juntas nem se repetem como resposta correta na mesma partida.
+As respostas usam três opções da mesma faixa intrínseca. Assets com os mesmos pixels compartilham uma identidade visual e nunca aparecem juntos: Austrália/Heard e McDonald, Clipperton/França/São Martinho, Diego Garcia/Território Britânico do Oceano Índico, Ceuta e Melilla/Espanha, Noruega/Svalbard e Jan Mayen e Estados Unidos/Ilhas Menores Distantes dos EUA.
+
+## Dificuldade do jogo da memória
+
+No jogo **Memória das Bandeiras**, a dificuldade altera somente o tamanho do tabuleiro. A classificação editorial dos quizzes não participa do sorteio.
+
+| Nível   | Cartas | Pares | Linhas de quatro |
+| ------- | -----: | ----: | ---------------: |
+| Fácil   |     20 |    10 |                5 |
+| Médio   |     24 |    12 |                6 |
+| Difícil |     28 |    14 |                7 |
+
+A primeira carta permanece aberta até a segunda escolha. Um par correto fica revelado, incrementa a sequência e reproduz o efeito de acerto; um erro mantém as duas cartas visíveis por 900 ms, reinicia a sequência e bloqueia o tabuleiro até o fim da animação de fechamento.
 
 ## DEMO
 
@@ -80,6 +93,7 @@ src/
     flag-game/
     find-flag-game/
     guess-flag-game/
+    memory-game/
   shared/
     domain/flags/
     gameplay/flag-quiz/
@@ -113,6 +127,8 @@ Os dois quizzes usam três efeitos locais em `src/shared/assets/audio/game-effec
 - `incorrect-answer.wav`
 - `game-finished.wav`
 
+O jogo da memória reutiliza `correct-answer.wav` exatamente uma vez por par encontrado, inclusive no último par. Não reproduz som ao abrir a primeira carta nem em um erro.
+
 Para recriar o tema e os efeitos originais:
 
 ```bash
@@ -124,7 +140,7 @@ Para substituir ou adicionar efeitos, mantenha arquivos WAV válidos, importe-os
 
 ## Catálogo de bandeiras
 
-O catálogo possui 262 bandeiras RGI do Unicode Emoji 17.0: 259 de países/regiões e as bandeiras de Inglaterra, Escócia e País de Gales. No jogo Bandeiras Giratórias, 30 bandeiras são sorteadas ao iniciar ou tocar em Sortear novamente; nos quizzes, uma bandeira é usada como pergunta ou alternativa em cada uma das dez rodadas conforme a distribuição da dificuldade escolhida.
+O catálogo possui 262 bandeiras RGI do Unicode Emoji 17.0: 259 de países/regiões e as bandeiras de Inglaterra, Escócia e País de Gales. No jogo Bandeiras Giratórias, 30 bandeiras são sorteadas ao iniciar ou tocar em Sortear novamente; nos quizzes, uma bandeira é usada como pergunta ou alternativa em cada uma das dez rodadas conforme a distribuição da dificuldade escolhida; na memória, são sorteadas 10, 12 ou 14 identidades visuais e cada uma gera exatamente duas cartas.
 
 A curadoria fica em `src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts`. Ao alterar o catálogo compartilhado, atualize também essa classificação e os grupos de equivalência visual quando necessário. O validador do núcleo verifica quantidade, IDs duplicados, IDs desconhecidos e bandeiras sem nível.
 
@@ -150,4 +166,5 @@ As bandeiras são imagens PNG locais do [Twemoji](https://github.com/jdecked/twe
 
 - As bandeiras seguem o estilo visual do Twemoji, que pode diferir do emoji nativo do aparelho.
 - Os quizzes ainda não possuem cronômetro nem persistência de melhor pontuação.
+- O jogo da memória ainda não possui cronômetro, ranking nem persistência de melhor resultado.
 - A dificuldade representa familiaridade estimada para o público brasileiro e deve evoluir por curadoria e feedback, não por uma métrica universal de países.

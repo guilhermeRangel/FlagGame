@@ -10,6 +10,7 @@ export type RootStackParamList = {
   [ROUTES.FLAG_GAME]: undefined;
   [ROUTES.GUESS_FLAG_GAME]: undefined;
   [ROUTES.FIND_FLAG_GAME]: undefined;
+  [ROUTES.MEMORY_GAME]: undefined;
 };
 
 export type AppNavigationProp = NativeStackNavigationProp<RootStackParamList>;

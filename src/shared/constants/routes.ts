@@ -6,4 +6,5 @@ export const ROUTES = {
   FLAG_GAME: 'FlagGame',
   GUESS_FLAG_GAME: 'GuessFlagGame',
   FIND_FLAG_GAME: 'FindFlagGame',
+  MEMORY_GAME: 'MemoryGame',
 } as const;
