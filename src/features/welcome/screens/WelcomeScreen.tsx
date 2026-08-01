@@ -13,7 +13,7 @@ import type { AppNavigationProp } from '@/shared/types/navigation';
 
 function configureMusicPlayer(player: AudioPlayer) {
   player.loop = true;
-  player.volume = 0.28;
+  player.volume = 0.20;
 }
 
 export function WelcomeScreen() {
@@ -42,6 +42,7 @@ export function WelcomeScreen() {
       { emoji: '🇺🇸', top: 140, left: 260 },
       { emoji: '🇯🇵', top: 220, left: 90 },
       { emoji: '🇫🇷', top: 320, left: 240 },
+      { emoji: '🇩🇪', top: 500, left: 0 },
     ],
     [],
   );

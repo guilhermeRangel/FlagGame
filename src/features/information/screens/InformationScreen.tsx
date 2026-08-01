@@ -15,7 +15,7 @@ export function InformationScreen({ navigation }: InformationScreenProps) {
       <Header title="Sobre o jogo" onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heroImage}>
-          <Text style={styles.heroEmoji}>🏁</Text>
+          <Text style={styles.heroEmoji}>🌎</Text>
         </View>
         <Text style={styles.sectionTitle}>Flag World</Text>
         <Text style={styles.bodyText}>
@@ -23,7 +23,7 @@ export function InformationScreen({ navigation }: InformationScreenProps) {
           interativa. Nesta primeira versão, o jogador poderá selecionar diferentes modos de jogo e
           interagir com bandeiras animadas.
         </Text>
-        <Text style={styles.sectionTitle}>Autores</Text>
+        <Text style={styles.sectionTitle}>Autor</Text>
         <Text style={styles.bodyText}>
           Criado por Guilherme Rangel, com apoio do ChatGPT e GitHub Copilot.
         </Text>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   heroImage: {
-    height: 220,
+    height: 200,
     borderRadius: 24,
     backgroundColor: colors.surface,
     alignItems: 'center',
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   heroEmoji: {
-    fontSize: 88,
+    fontSize: 120,
   },
   sectionTitle: {
     color: colors.textPrimary,
