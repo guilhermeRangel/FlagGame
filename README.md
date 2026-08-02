@@ -84,6 +84,17 @@ npx expo run:android
 npx expo run:ios
 ```
 
+## Qualidade e validação
+
+```bash
+npm run typecheck
+npm run lint
+npm run format:check
+npx expo install --check
+```
+
+O lint usa a configuração flat do ESLint 9 e falha se encontrar qualquer warning.
+
 ## Estrutura principal
 
 ```text
@@ -97,11 +108,12 @@ src/
   shared/
     domain/flags/
     gameplay/flag-quiz/
+    utils/
 docs/
   handoffs/
 ```
 
-Cada modalidade mantém tela e apresentação próprias em sua feature. O tipo e o catálogo ficam em `src/shared/domain/flags/`, enquanto as regras reutilizadas pelos dois quizzes ficam em `src/shared/gameplay/flag-quiz/`. A pasta `docs/handoffs/` mantém o histórico das sessões que alteram comportamento, arquitetura ou navegação.
+Cada modalidade mantém tela e apresentação próprias em sua feature. O tipo e o catálogo ficam em `src/shared/domain/flags/`, enquanto as regras reutilizadas pelos dois quizzes ficam em `src/shared/gameplay/flag-quiz/`. Em `src/shared/utils/` ficam apenas utilitários puros usados por mais de um jogo, como o Fisher–Yates imutável. A pasta `docs/handoffs/` mantém o histórico das sessões que alteram comportamento, arquitetura ou navegação.
 
 ## Adicionar uma nova bandeira
 
@@ -136,6 +148,8 @@ node scripts/generate-welcome-theme.mjs
 node scripts/generate-game-effects.mjs
 ```
 
+Os dois geradores usam o mesmo escritor PCM/WAV em `scripts/wav-utils.mjs`, evitando duas implementações do cabeçalho binário.
+
 Para substituir ou adicionar efeitos, mantenha arquivos WAV válidos, importe-os estaticamente no hook compartilhado de áudio e preserve o fallback que impede falhas de áudio de interromper a partida. Não use `expo-av`.
 
 ## Catálogo de bandeiras
@@ -144,7 +158,7 @@ O catálogo possui 262 bandeiras RGI do Unicode Emoji 17.0: 259 de países/regi�
 
 A curadoria fica em `src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts`. Ao alterar o catálogo compartilhado, atualize também essa classificação e os grupos de equivalência visual quando necessário. O validador do núcleo verifica quantidade, IDs duplicados, IDs desconhecidos e bandeiras sem nível.
 
-O arquivo pode ser regenerado a partir do `emoji-test.txt` oficial:
+O arquivo pode ser regenerado a partir do `emoji-test.txt` oficial. O gerador aceita somente o cabeçalho `# Version: 17.0`, evitando substituir silenciosamente o catálogo por outra versão:
 
 ```bash
 node scripts/generate-flags-data.mjs /caminho/para/emoji-test.txt

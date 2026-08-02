@@ -2,7 +2,7 @@ import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import type { FlagVisual as FlagVisualValue } from '@/shared/domain/flags';
 
-export type FlagVisualProps = {
+type FlagVisualProps = {
   readonly visual: FlagVisualValue;
   readonly style?: StyleProp<ViewStyle>;
   readonly emojiStyle?: StyleProp<TextStyle>;

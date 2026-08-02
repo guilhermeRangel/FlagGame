@@ -10,7 +10,7 @@ import type {
   MemoryGameFeedbackResult,
   MemoryGameState,
 } from '@/features/memory-game/types';
-import { getFlagVisualIdentity } from '@/shared/domain/flags/flagVisualIdentity';
+import { getFlagVisualIdentity } from '@/shared/domain/flags';
 
 function createScoreState() {
   return {
@@ -35,7 +35,7 @@ function resetDeckCards(cards: readonly MemoryGameCard[]): MemoryGameCard[] {
   return cards.map((card) => ({ ...card, status: 'hidden' }));
 }
 
-export function isCompleteMemoryGameDeck(
+function isCompleteMemoryGameDeck(
   cards: readonly MemoryGameCard[],
   difficulty: MemoryGameDifficulty,
 ): boolean {
@@ -123,14 +123,12 @@ function createFeedbackEvent(
   result: MemoryGameFeedbackResult,
   cardIds: readonly [string, string],
   isGameFinished: boolean,
-  pairId?: string,
 ) {
   return {
     id: `${gameId}:${move}:${result}`,
     result,
     move,
     cardIds,
-    pairId,
     isGameFinished,
   } as const;
 }
@@ -204,7 +202,6 @@ export function memoryGameReducer(
             'match',
             [firstCard.id, selectedCard.id],
             isGameFinished,
-            firstCard.pairId,
           ),
         };
       }

@@ -2,10 +2,9 @@ import type { Flag } from '@/shared/domain/flags';
 
 export type MemoryGameDifficulty = 'easy' | 'medium' | 'hard';
 
-export type MemoryGameStatus =
-  'ready' | 'playing' | 'resolving-mismatch' | 'finished' | 'unavailable';
+type MemoryGameStatus = 'ready' | 'playing' | 'resolving-mismatch' | 'finished' | 'unavailable';
 
-export type MemoryGameCardStatus = 'hidden' | 'revealed' | 'matched';
+type MemoryGameCardStatus = 'hidden' | 'revealed' | 'matched';
 
 export type MemoryGameCard = {
   readonly id: string;
@@ -16,12 +15,11 @@ export type MemoryGameCard = {
 
 export type MemoryGameFeedbackResult = 'match' | 'mismatch';
 
-export type MemoryGameFeedbackEvent = {
+type MemoryGameFeedbackEvent = {
   readonly id: string;
   readonly result: MemoryGameFeedbackResult;
   readonly move: number;
   readonly cardIds: readonly [string, string];
-  readonly pairId?: string;
   readonly isGameFinished: boolean;
 };
 
@@ -64,6 +62,5 @@ export type MemoryGameAction =
 
 export type MemoryGameDifficultyConfig = {
   readonly label: string;
-  readonly cardCount: number;
   readonly pairCount: number;
 };

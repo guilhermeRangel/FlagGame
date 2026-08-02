@@ -6,18 +6,15 @@ import { AppButton } from '@/shared/components/AppButton';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { Header } from '@/shared/components/Header';
 import { ScreenContainer } from '@/shared/components/ScreenContainer';
-import { FLAG_OPTIONS } from '@/shared/domain/flags';
 import {
-  FLAG_QUIZ_OPTION_COUNT,
-  FLAG_QUIZ_TOTAL_ROUNDS,
   FlagQuizDifficultySelector,
   FlagQuizFeedback,
   FlagQuizGameHud,
   FlagQuizGameResult,
   getFlagQuizOptionState,
   useFlagQuizGame,
-  useFlagQuizGameSounds,
 } from '@/shared/gameplay/flag-quiz';
+import { useFlagQuizScreenEffects } from '@/shared/gameplay/flag-quiz/hooks/useFlagQuizScreenEffects';
 import { useScreenOrientation } from '@/shared/hooks/useScreenOrientation';
 import { spacing } from '@/shared/theme';
 import type { AppNavigationProp } from '@/shared/types/navigation';
@@ -30,28 +27,13 @@ export function FindFlagGameScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const { state, currentRound, submitAnswer, selectDifficulty, restartGame, changeDifficulty } =
     useFlagQuizGame({
-      flags: FLAG_OPTIONS,
-      totalRounds: FLAG_QUIZ_TOTAL_ROUNDS,
-      optionCount: FLAG_QUIZ_OPTION_COUNT,
       feedbackDurationMs: FIND_FLAG_FEEDBACK_DURATION_MS,
     });
-  const { playAnswerFeedback, playGameFinished } = useFlagQuizGameSounds();
   const shouldReturnToGameList = useRef(false);
   const gameScrollView = useRef<ScrollView>(null);
 
   useScreenOrientation(ScreenOrientation.OrientationLock.PORTRAIT);
-
-  useEffect(() => {
-    if (state.status === 'showing-feedback' && state.feedback) {
-      playAnswerFeedback(state.feedback);
-    }
-  }, [playAnswerFeedback, state.feedback, state.status]);
-
-  useEffect(() => {
-    if (state.status === 'finished') {
-      playGameFinished(state.gameId);
-    }
-  }, [playGameFinished, state.gameId, state.status]);
+  useFlagQuizScreenEffects({ state, scrollViewRef: gameScrollView });
 
   useEffect(() => {
     if (state.status === 'selecting-difficulty' && shouldReturnToGameList.current) {
@@ -59,23 +41,6 @@ export function FindFlagGameScreen() {
       navigation.goBack();
     }
   }, [navigation, state.status]);
-
-  useEffect(() => {
-    if (state.status !== 'playing' && state.status !== 'showing-feedback') {
-      return undefined;
-    }
-
-    const animationFrame = requestAnimationFrame(() => {
-      if (state.status === 'showing-feedback') {
-        gameScrollView.current?.scrollToEnd({ animated: true });
-        return;
-      }
-
-      gameScrollView.current?.scrollTo({ y: 0, animated: false });
-    });
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [state.currentRoundIndex, state.status]);
 
   usePreventRemove(state.status !== 'selecting-difficulty', () => {
     changeDifficulty();

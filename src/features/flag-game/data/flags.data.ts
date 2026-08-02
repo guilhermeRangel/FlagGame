@@ -1,17 +1,22 @@
 import { FLAG_OPTIONS } from '@/shared/domain/flags';
 import type { Flag } from '@/shared/domain/flags';
+import { shuffleCopy } from '@/shared/utils';
+import type { RandomSource } from '@/shared/utils';
 
-const shuffleOffset = 0.5;
 const initialFlagsAmount = 30;
 
 export { FLAG_OPTIONS };
 
-export function getRandomFlags(flags: readonly Flag[], amount: number): Flag[] {
+export function getRandomFlags(
+  flags: readonly Flag[],
+  amount: number,
+  random: RandomSource = Math.random,
+): Flag[] {
   if (amount <= 0) {
     return [];
   }
 
-  const shuffled = [...flags].sort(() => Math.random() - shuffleOffset);
+  const shuffled = shuffleCopy(flags, random);
 
   if (amount >= flags.length) {
     return shuffled;

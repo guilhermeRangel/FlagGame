@@ -7,7 +7,7 @@ import type { Flag } from './types';
  * As entradas continuam disponíveis individualmente, mas nunca devem aparecer
  * juntas em uma escolha ou como pares distintos na mesma partida.
  */
-export const FLAG_VISUAL_EQUIVALENCE_GROUPS = [
+const FLAG_VISUAL_EQUIVALENCE_GROUPS = [
   ['au', 'hm'],
   ['cp', 'fr', 'mf'],
   ['dg', 'io'],
@@ -26,11 +26,4 @@ const VISUAL_IDENTITY_BY_FLAG_ID = new Map<string, string>(
 
 export function getFlagVisualIdentity(flag: Pick<Flag, 'id'>): string {
   return VISUAL_IDENTITY_BY_FLAG_ID.get(flag.id) ?? `flag:${flag.id}`;
-}
-
-export function haveEquivalentFlagVisuals(
-  firstFlag: Pick<Flag, 'id'>,
-  secondFlag: Pick<Flag, 'id'>,
-): boolean {
-  return getFlagVisualIdentity(firstFlag) === getFlagVisualIdentity(secondFlag);
 }

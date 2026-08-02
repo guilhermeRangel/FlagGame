@@ -18,36 +18,18 @@ import {
   FlagQuizGameResult,
   getFlagQuizOptionState,
   useFlagQuizGame,
-  useFlagQuizGameSounds,
 } from '@/shared/gameplay/flag-quiz';
+import { useFlagQuizScreenEffects } from '@/shared/gameplay/flag-quiz/hooks/useFlagQuizScreenEffects';
 
 export function GuessFlagGameScreen() {
   const navigation = useNavigation<AppNavigationProp>();
-  const {
-    state,
-    currentRound,
-    answerCurrentRound,
-    selectDifficulty,
-    restartGame,
-    changeDifficulty,
-  } = useFlagQuizGame();
-  const { playAnswerFeedback, playGameFinished } = useFlagQuizGameSounds();
+  const { state, currentRound, submitAnswer, selectDifficulty, restartGame, changeDifficulty } =
+    useFlagQuizGame();
   const shouldReturnToGameList = useRef(false);
   const gameScrollView = useRef<ScrollView>(null);
 
   useScreenOrientation(ScreenOrientation.OrientationLock.PORTRAIT);
-
-  useEffect(() => {
-    if (state.status === 'showing-feedback' && state.feedback) {
-      playAnswerFeedback(state.feedback);
-    }
-  }, [playAnswerFeedback, state.feedback, state.status]);
-
-  useEffect(() => {
-    if (state.status === 'finished') {
-      playGameFinished(state.gameId);
-    }
-  }, [playGameFinished, state.gameId, state.status]);
+  useFlagQuizScreenEffects({ state, scrollViewRef: gameScrollView });
 
   useEffect(() => {
     if (state.status === 'selecting-difficulty' && shouldReturnToGameList.current) {
@@ -55,23 +37,6 @@ export function GuessFlagGameScreen() {
       navigation.goBack();
     }
   }, [navigation, state.status]);
-
-  useEffect(() => {
-    if (state.status !== 'playing' && state.status !== 'showing-feedback') {
-      return undefined;
-    }
-
-    const animationFrame = requestAnimationFrame(() => {
-      if (state.status === 'showing-feedback') {
-        gameScrollView.current?.scrollToEnd({ animated: true });
-        return;
-      }
-
-      gameScrollView.current?.scrollTo({ y: 0, animated: false });
-    });
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [state.currentRoundIndex, state.status]);
 
   usePreventRemove(state.status !== 'selecting-difficulty', () => {
     changeDifficulty();
@@ -189,7 +154,7 @@ export function GuessFlagGameScreen() {
                 state.status,
               )}
               isSelected={state.selectedOptionId === option.id}
-              onPress={answerCurrentRound}
+              onPress={submitAnswer}
             />
           ))}
         </View>

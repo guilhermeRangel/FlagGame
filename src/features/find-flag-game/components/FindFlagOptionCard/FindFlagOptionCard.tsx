@@ -1,9 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import {
-  FlagVisual,
-  type FlagQuizChoice,
-  type FlagQuizOptionState,
-} from '@/shared/gameplay/flag-quiz';
+import { FlagVisual } from '@/shared/components/FlagVisual';
+import type { FlagQuizChoice, FlagQuizOptionState } from '@/shared/gameplay/flag-quiz';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
 
 type FindFlagOptionCardProps = {

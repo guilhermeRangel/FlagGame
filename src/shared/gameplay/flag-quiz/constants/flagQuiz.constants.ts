@@ -15,9 +15,9 @@ export const FLAG_QUIZ_DIFFICULTIES: readonly FlagQuizDifficulty[] = [
   'expert',
 ];
 
-export type DifficultyRoundDistribution = Readonly<Record<FlagQuizDifficulty, number>>;
+type DifficultyRoundDistribution = Readonly<Record<FlagQuizDifficulty, number>>;
 
-export type FlagQuizDifficultyConfig = {
+type FlagQuizDifficultyConfig = {
   readonly label: string;
   readonly description: string;
   readonly examples: string;

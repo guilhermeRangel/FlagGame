@@ -20,7 +20,7 @@ if (typeof __DEV__ !== 'undefined' && __DEV__) {
   assertFlagDifficultyClassification(FLAG_OPTIONS);
 }
 
-export type FlagQuizGameAction =
+type FlagQuizGameAction =
   | {
       readonly type: 'selectDifficulty';
       readonly difficulty: FlagQuizDifficulty;
@@ -70,7 +70,7 @@ function createGameState(
   };
 }
 
-export function flagQuizGameReducer(
+function flagQuizGameReducer(
   state: FlagQuizGameState,
   action: FlagQuizGameAction,
 ): FlagQuizGameState {
@@ -166,7 +166,7 @@ function createQuestions(
   });
 }
 
-export type UseFlagQuizGameOptions = {
+type UseFlagQuizGameOptions = {
   readonly flags?: readonly Flag[];
   readonly totalRounds?: number;
   readonly optionCount?: number;
@@ -233,10 +233,8 @@ export function useFlagQuizGame({
 
   return {
     state,
-    difficulty: state.difficulty,
     currentRound: state.rounds[state.currentRoundIndex],
     submitAnswer,
-    answerCurrentRound: submitAnswer,
     selectDifficulty,
     restartGame,
     changeDifficulty,

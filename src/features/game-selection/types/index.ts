@@ -1,11 +1,9 @@
-import type { ImageSourcePropType } from 'react-native';
 import type { RootStackParamList } from '@/shared/types/navigation';
 
 type BaseGameOption = {
   id: string;
   title: string;
   description: string;
-  icon?: ImageSourcePropType;
 };
 
 export type GameOption =

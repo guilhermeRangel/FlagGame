@@ -3,38 +3,15 @@ import {
   isMemoryGameDifficulty,
 } from '@/features/memory-game/constants/memoryGame.constants';
 import type { MemoryGameCard, MemoryGameDifficulty } from '@/features/memory-game/types';
-import { getFlagVisualIdentity } from '@/shared/domain/flags/flagVisualIdentity';
+import { getFlagVisualIdentity } from '@/shared/domain/flags';
 import type { Flag } from '@/shared/domain/flags';
+import { normalizeCountryName, shuffleCopy } from '@/shared/utils';
+import type { RandomSource } from '@/shared/utils';
 
-export type RandomSource = () => number;
-
-export type CreateMemoryGameDeckOptions = {
+type CreateMemoryGameDeckOptions = {
   readonly difficulty: MemoryGameDifficulty;
   readonly random?: RandomSource;
 };
-
-function normalizeRandomValue(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-
-  return Math.max(0, Math.min(0.999_999, value));
-}
-
-function shuffleCopy<T>(items: readonly T[], random: RandomSource): T[] {
-  const shuffled = [...items];
-
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(normalizeRandomValue(random()) * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-  }
-
-  return shuffled;
-}
-
-function normalizeCountryName(countryName: string): string {
-  return countryName.trim().normalize('NFKC').toLocaleLowerCase('pt-BR');
-}
 
 function getUniqueFlags(flags: readonly Flag[]): Flag[] {
   const flagIds = new Set<string>();

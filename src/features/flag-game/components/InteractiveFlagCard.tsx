@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Image, Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -7,7 +7,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { colors, borderRadius, fontSizes, spacing } from '@/shared/theme';
+import { FlagVisual } from '@/shared/components/FlagVisual';
 import type { Flag } from '@/shared/domain/flags';
+import { MAX_FLAG_ROTATIONS } from '@/features/flag-game/constants';
 import type { RotationSpeed } from '@/features/flag-game/types';
 
 type InteractiveFlagCardProps = {
@@ -18,7 +20,7 @@ type InteractiveFlagCardProps = {
 
 export function InteractiveFlagCard({ flag, speed, onPress }: InteractiveFlagCardProps) {
   const rotation = useSharedValue(0);
-  const isUnavailable = speed === 4;
+  const isUnavailable = speed === MAX_FLAG_ROTATIONS;
 
   useEffect(() => {
     rotation.value = withTiming(speed * 90, { duration: 220, easing: Easing.linear });
@@ -28,9 +30,9 @@ export function InteractiveFlagCard({ flag, speed, onPress }: InteractiveFlagCar
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
-  let label = '4';
-  if (speed > 0 && speed < 4) {
-    const remainingSpins = 4 - speed;
+  let label = `${MAX_FLAG_ROTATIONS}`;
+  if (speed > 0 && speed < MAX_FLAG_ROTATIONS) {
+    const remainingSpins = MAX_FLAG_ROTATIONS - speed;
     label = `${remainingSpins} giro${remainingSpins === 1 ? '' : 's'}${remainingSpins === 1 ? '' : ' '}`;
   } else if (isUnavailable) {
     label = 'Indisponível';
@@ -41,7 +43,7 @@ export function InteractiveFlagCard({ flag, speed, onPress }: InteractiveFlagCar
       accessibilityRole="button"
       accessibilityLabel={`Bandeira ${flag.countryName}`}
       accessibilityHint={
-        isUnavailable ? 'Os quatro giros já foram usados' : 'Gira a bandeira uma vez'
+        isUnavailable ? `Os ${MAX_FLAG_ROTATIONS} giros já foram usados` : 'Gira a bandeira uma vez'
       }
       accessibilityState={{ disabled: isUnavailable }}
       disabled={isUnavailable}
@@ -51,18 +53,11 @@ export function InteractiveFlagCard({ flag, speed, onPress }: InteractiveFlagCar
       <Animated.View
         style={[styles.flagDisplay, isUnavailable && styles.flagDisplayUnavailable, animatedStyle]}
       >
-        {flag.visual.type === 'emoji' ? (
-          <Text style={[styles.emoji, isUnavailable && styles.visualUnavailable]}>
-            {flag.visual.value}
-          </Text>
-        ) : (
-          <Image
-            source={flag.visual.source}
-            style={[styles.asset, isUnavailable && styles.visualUnavailable]}
-            resizeMode="contain"
-            accessible={false}
-          />
-        )}
+        <FlagVisual
+          visual={flag.visual}
+          style={[styles.visual, isUnavailable && styles.visualUnavailable]}
+          emojiStyle={styles.emoji}
+        />
       </Animated.View>
       <Text style={styles.countryName} numberOfLines={2} ellipsizeMode="tail">
         {flag.countryName}
@@ -102,13 +97,14 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 26,
+    lineHeight: 32,
+  },
+  visual: {
+    width: '86%',
+    height: '76%',
   },
   visualUnavailable: {
     opacity: 0.55,
-  },
-  asset: {
-    width: '86%',
-    height: '76%',
   },
   countryName: {
     color: colors.textPrimary,

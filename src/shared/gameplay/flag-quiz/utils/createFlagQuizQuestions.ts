@@ -10,10 +10,10 @@ import type {
 } from '@/shared/gameplay/flag-quiz/types';
 import { getFlagVisualIdentity } from '@/shared/domain/flags';
 import type { Flag } from '@/shared/domain/flags';
+import { normalizeCountryName, shuffleCopy } from '@/shared/utils';
+import type { RandomSource } from '@/shared/utils';
 
-export type RandomSource = () => number;
-
-export type CreateFlagQuizQuestionsOptions = {
+type CreateFlagQuizQuestionsOptions = {
   readonly totalRounds: number;
   readonly optionCount: number;
   readonly difficulty: FlagQuizDifficulty;
@@ -30,25 +30,6 @@ const DIFFICULTY_BY_FLAG_ID = new Map<string, FlagQuizDifficulty>(
     FLAG_IDS_BY_DIFFICULTY[difficulty].map((flagId) => [flagId, difficulty] as const),
   ),
 );
-
-function shuffleCopy<T>(items: readonly T[], random: RandomSource): T[] {
-  const shuffled = [...items];
-
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const nextRandomValue = random();
-    const randomValue = Number.isFinite(nextRandomValue)
-      ? Math.max(0, Math.min(0.999_999, nextRandomValue))
-      : 0;
-    const swapIndex = Math.floor(randomValue * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-  }
-
-  return shuffled;
-}
-
-function normalizeCountryName(countryName: string): string {
-  return countryName.trim().normalize('NFKC').toLocaleLowerCase('pt-BR');
-}
 
 function getUniqueClassifiedFlags(flags: readonly Flag[]): ClassifiedFlag[] {
   const ids = new Set<string>();
@@ -239,30 +220,6 @@ function hasEnoughSameTierOptions(
     ) >=
     optionCount - 1
   );
-}
-
-export function createFlagQuizRound(
-  flags: readonly Flag[],
-  optionCount: number,
-  random: RandomSource = Math.random,
-): FlagQuizRound | undefined {
-  const uniqueFlags = getUniqueClassifiedFlags(flags);
-  const safeOptionCount = normalizePositiveInteger(optionCount);
-
-  if (uniqueFlags.length === 0 || safeOptionCount === 0) {
-    return undefined;
-  }
-
-  const viableCorrectFlags = uniqueFlags.filter((classifiedFlag) =>
-    hasEnoughSameTierOptions(classifiedFlag, uniqueFlags, safeOptionCount),
-  );
-  const [correctFlag] = shuffleCopy(viableCorrectFlags, random);
-
-  if (!correctFlag) {
-    return undefined;
-  }
-
-  return createRoundForCorrectFlag(correctFlag, uniqueFlags, safeOptionCount, 0, random);
 }
 
 export function createFlagQuizQuestions(

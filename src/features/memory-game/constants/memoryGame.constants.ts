@@ -13,17 +13,14 @@ export const MEMORY_GAME_DIFFICULTY_CONFIG: Readonly<
 > = {
   easy: {
     label: 'Fácil',
-    cardCount: 20,
     pairCount: 10,
   },
   medium: {
     label: 'Médio',
-    cardCount: 24,
     pairCount: 12,
   },
   hard: {
     label: 'Difícil',
-    cardCount: 28,
     pairCount: 14,
   },
 };
@@ -33,7 +30,7 @@ export function isMemoryGameDifficulty(value: unknown): value is MemoryGameDiffi
 }
 
 export function getMemoryGameCardCount(difficulty: MemoryGameDifficulty): number {
-  return MEMORY_GAME_DIFFICULTY_CONFIG[difficulty].cardCount;
+  return getMemoryGamePairCount(difficulty) * 2;
 }
 
 export function getMemoryGamePairCount(difficulty: MemoryGameDifficulty): number {

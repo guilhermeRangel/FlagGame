@@ -39,11 +39,3 @@ export const fontSizes = {
   xl: 24,
   xxl: 32,
 } as const;
-
-export const animationDurations = {
-  fast: 180,
-  normal: 260,
-  slow: 420,
-} as const;
-
-export const maxRotationSpeed = 4 as const;

@@ -1,5 +1,4 @@
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RouteProp } from '@react-navigation/native';
 import type { ROUTES } from '@/shared/constants/routes';
 
 export type RootStackParamList = {
@@ -14,7 +13,3 @@ export type RootStackParamList = {
 };
 
 export type AppNavigationProp = NativeStackNavigationProp<RootStackParamList>;
-export type AppRouteProp<RouteName extends keyof RootStackParamList> = RouteProp<
-  RootStackParamList,
-  RouteName
->;

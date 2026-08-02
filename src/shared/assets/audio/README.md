@@ -8,7 +8,7 @@ Para regenerar o áudio original a partir do código-fonte do sintetizador:
 node scripts/generate-welcome-theme.mjs
 ```
 
-## Efeitos do jogo Qual é a Bandeira?
+## Efeitos dos jogos
 
 A pasta `game-effects/` contém três efeitos WAV PCM locais e sem dependência de rede:
 
@@ -22,4 +22,6 @@ Para regenerar os três arquivos originais:
 node scripts/generate-game-effects.mjs
 ```
 
-Os efeitos são reproduzidos por `useGuessFlagGameSounds` com `expo-audio`. O hook impede sobreposição, volta o efeito ao início antes de tocar e ignora falhas do aparelho sem quebrar o jogo.
+Os dois quizzes reproduzem os efeitos por `useFlagQuizGameSounds` com `expo-audio`. O jogo da memória reutiliza `correct-answer.wav` por `useMemoryGameSounds`, uma vez para cada par confirmado. Os hooks impedem sobreposição, voltam o efeito ao início antes de tocar e ignoram falhas do aparelho sem quebrar o jogo.
+
+Os geradores do tema e dos efeitos compartilham o escritor PCM/WAV de `scripts/wav-utils.mjs`.

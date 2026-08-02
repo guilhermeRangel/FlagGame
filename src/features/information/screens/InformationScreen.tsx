@@ -1,16 +1,14 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '@/shared/components/ScreenContainer';
 import { Header } from '@/shared/components/Header';
 import { FLAG_ASSETS } from '@/shared/domain/flags';
 import { colors, fontSizes, spacing } from '@/shared/theme';
+import type { AppNavigationProp } from '@/shared/types/navigation';
 
-type InformationScreenProps = {
-  navigation: {
-    goBack: () => void;
-  };
-};
+export function InformationScreen() {
+  const navigation = useNavigation<AppNavigationProp>();
 
-export function InformationScreen({ navigation }: InformationScreenProps) {
   return (
     <ScreenContainer style={styles.container}>
       <Header title="Sobre o jogo" onBack={() => navigation.goBack()} />

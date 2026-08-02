@@ -2,12 +2,31 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 const sourcePath = process.argv[2];
+const expectedEmojiVersion = '17.0';
 
 if (!sourcePath) {
   throw new Error('Informe o caminho do emoji-test.txt oficial do Unicode.');
 }
 
 const source = readFileSync(sourcePath, 'utf8');
+const firstGroupIndex = source.search(/^# group:/m);
+const header = firstGroupIndex === -1 ? source : source.slice(0, firstGroupIndex);
+const versionMatch = header.match(/^# Version:\s*([^\s]+)\s*$/m);
+
+if (!versionMatch) {
+  throw new Error(
+    `O cabeçalho do emoji-test.txt deve declarar "# Version: ${expectedEmojiVersion}".`,
+  );
+}
+
+const [, emojiVersion] = versionMatch;
+
+if (emojiVersion !== expectedEmojiVersion) {
+  throw new Error(
+    `Versão Unicode Emoji incompatível: esperada ${expectedEmojiVersion}, recebida ${emojiVersion}.`,
+  );
+}
+
 const names = new Intl.DisplayNames(['pt-BR'], { type: 'region' });
 const entries = [];
 let isCountryFlagSection = false;

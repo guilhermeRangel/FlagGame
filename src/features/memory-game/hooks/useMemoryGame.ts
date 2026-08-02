@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import {
-  createMemoryGameDeck,
-  createMemoryGameInitialState,
   MEMORY_CARD_FLIP_DURATION_MS,
   MEMORY_MISMATCH_REVEAL_DURATION_MS,
+} from '@/features/memory-game/constants/memoryGame.constants';
+import {
+  createMemoryGameInitialState,
   memoryGameReducer,
-  type MemoryGameDifficulty,
-  type RandomSource,
-} from '@/features/memory-game';
+} from '@/features/memory-game/state/memoryGame.reducer';
+import type { MemoryGameDifficulty } from '@/features/memory-game/types';
+import { createMemoryGameDeck } from '@/features/memory-game/utils/createMemoryGameDeck';
 import { FLAG_OPTIONS } from '@/shared/domain/flags';
 import type { Flag } from '@/shared/domain/flags';
+import type { RandomSource } from '@/shared/utils';
 
 type UseMemoryGameOptions = {
   readonly flags?: readonly Flag[];

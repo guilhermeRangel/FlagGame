@@ -37,7 +37,7 @@ Welcome
 - Nos quizzes, voltar durante uma partida ou no resultado abandona a partida e retorna ao seletor de dificuldade; voltar a partir do seletor retorna à seleção de jogos. O bloqueio do gesto/botão nativo segue a mesma regra por `usePreventRemove`.
 - Na memória, voltar durante a partida ou no resultado retorna à configuração; voltar na configuração retorna à seleção de jogos.
 - Jogar novamente reinicia o reducer compartilhado no mesmo nível; não empilha uma segunda tela.
-- A fonte canônica das rotas é [src/shared/constants/routes.ts](src/shared/constants/routes.ts). O diretório legado `src/app/routes/` não possui consumidores e não deve virar uma segunda fonte de verdade.
+- A única fonte de verdade das rotas é [src/shared/constants/routes.ts](src/shared/constants/routes.ts); a definição legada em `src/app/routes/` foi removida.
 
 ## Estado confirmado do aplicativo
 
@@ -50,7 +50,7 @@ Welcome
 - Os dois quizzes compartilham quatro dificuldades editoriais e classificam as 262 bandeiras exatamente uma vez: 43 fáceis, 90 médias, 70 difíceis e 59 especialistas.
 - O aplicativo não depende mais da fonte de emojis do sistema para mostrar bandeiras.
 - O domínio global `Flag`, `FlagVisual` e `FLAG_OPTIONS` fica em `src/shared/domain/flags/`.
-- O componente visual neutro fica em `src/shared/components/FlagVisual/`; os caminhos antigos do núcleo dos quizzes permanecem como reexports compatíveis.
+- O componente visual neutro fica somente em `src/shared/components/FlagVisual/`; os adapters e reexports visuais antigos dos quizzes foram removidos.
 
 ## Jogo 1 — Bandeiras Giratórias
 
@@ -59,7 +59,8 @@ Welcome
 - Cada bandeira aceita quatro toques, acumulando 90° por toque até completar 360°.
 - Após o quarto toque, o card fica desabilitado, muda para aparência indisponível e deixa de atualizar o estado.
 - Resetar limpa os giros; Sortear novamente escolhe outras 30 bandeiras.
-- Regras de rotação, estado e randomização continuam exclusivas da feature `flag-game`.
+- O limite de giros possui uma única fonte em `flag-game/constants.ts` e é usado pelo tipo, regra, tela e card.
+- O sorteio usa o Fisher–Yates imutável de `shared/utils`, também consumido pelos quizzes e pela memória.
 
 ## Jogo 2 — Qual é a Bandeira?
 
@@ -233,6 +234,7 @@ src/
     hooks/
     theme/
     types/
+    utils/
 docs/handoffs/
 scripts/
 ```
@@ -248,6 +250,7 @@ scripts/
 - [src/shared/assets/flags](src/shared/assets/flags): 262 imagens locais e atribuição do Twemoji.
 - [src/shared/domain/flags/types.ts](src/shared/domain/flags/types.ts): domínio neutro, sem dependência de React Native.
 - [src/features/flag-game/screens/FlagGameScreen.tsx](src/features/flag-game/screens/FlagGameScreen.tsx): primeiro jogo.
+- [src/features/flag-game/constants.ts](src/features/flag-game/constants.ts): velocidades e limite canônico de quatro giros.
 - [src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx](src/features/guess-flag-game/screens/GuessFlagGameScreen.tsx): composição específica do quiz bandeira → nome.
 - [src/features/find-flag-game/screens/FindFlagGameScreen.tsx](src/features/find-flag-game/screens/FindFlagGameScreen.tsx): composição específica do quiz nome → bandeira.
 - [src/features/memory-game/screens/MemoryGameScreen.tsx](src/features/memory-game/screens/MemoryGameScreen.tsx): composição, navegação e acessibilidade do quarto jogo.
@@ -255,6 +258,8 @@ scripts/
 - [src/features/memory-game/utils/createMemoryGameDeck.ts](src/features/memory-game/utils/createMemoryGameDeck.ts): geração determinística dos tabuleiros 20/24/28.
 - [src/shared/components/FlagVisual/FlagVisual.tsx](src/shared/components/FlagVisual/FlagVisual.tsx): renderizador neutro para PNG ou emoji.
 - [src/shared/domain/flags/flagVisualIdentity.ts](src/shared/domain/flags/flagVisualIdentity.ts): equivalências visuais compartilhadas por quizzes e memória.
+- [src/shared/utils/random.ts](src/shared/utils/random.ts): Fisher–Yates imutável e fonte aleatória compartilhada.
+- [src/shared/utils/countryName.ts](src/shared/utils/countryName.ts): normalização de nomes usada pelos geradores.
 - [src/shared/gameplay/flag-quiz/index.ts](src/shared/gameplay/flag-quiz/index.ts): API pública do núcleo compartilhado.
 - [src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts](src/shared/gameplay/flag-quiz/data/flag-difficulty.data.ts): curadoria explícita dos 262 IDs.
 - [src/shared/gameplay/flag-quiz/hooks/useFlagQuizGame.ts](src/shared/gameplay/flag-quiz/hooks/useFlagQuizGame.ts): reducer, geração e lifecycle configurável da partida.
@@ -264,11 +269,13 @@ scripts/
 - [scripts/download-flag-assets.mjs](scripts/download-flag-assets.mjs): baixa/valida os PNGs e regenera o mapa estático.
 - [scripts/generate-welcome-theme.mjs](scripts/generate-welcome-theme.mjs): regenera o tema da Welcome.
 - [scripts/generate-game-effects.mjs](scripts/generate-game-effects.mjs): regenera os três efeitos do quiz.
+- [scripts/wav-utils.mjs](scripts/wav-utils.mjs): escritor PCM/WAV compartilhado pelos dois geradores de áudio.
 - [docs/handoffs/2026-08-01-guess-flag-game.md](docs/handoffs/2026-08-01-guess-flag-game.md): detalhes da sessão do segundo jogo.
 - [docs/handoffs/2026-08-01-local-flag-assets.md](docs/handoffs/2026-08-01-local-flag-assets.md): migração de emojis para imagens locais.
 - [docs/handoffs/2026-08-01-guess-flag-difficulty.md](docs/handoffs/2026-08-01-guess-flag-difficulty.md): implementação das quatro dificuldades.
 - [docs/handoffs/2026-08-01-find-flag-game.md](docs/handoffs/2026-08-01-find-flag-game.md): terceira modalidade e extração do núcleo compartilhado.
 - [docs/handoffs/2026-08-01-memory-game.md](docs/handoffs/2026-08-01-memory-game.md): quarta modalidade, mecânica e validações da sessão.
+- [docs/handoffs/2026-08-01-technical-debt-cleanup.md](docs/handoffs/2026-08-01-technical-debt-cleanup.md): remoções confirmadas, simplificações e validações da limpeza técnica.
 
 ## Decisões arquiteturais
 
@@ -280,9 +287,22 @@ scripts/
 - Usar reducer em vez de vários `useState` desconectados.
 - Gerar toda a partida uma única vez ao iniciar/reiniciar.
 - Manter reducer e hook próprios para a memória; sua máquina de pares não é encaixada artificialmente no núcleo de quiz.
+- Compartilhar somente utilitários puros com mais de um consumidor; `shuffleCopy`, `RandomSource` e normalização de país ficam em `shared/utils`.
 - Centralizar labels, exemplos, multiplicadores e distribuições em `DIFFICULTY_CONFIG`, além dos valores configuráveis de rodadas, opções, pontos e duração do feedback.
 - Usar união discriminada em `GameOption`: item disponível exige rota em compile-time.
 - Não adicionar biblioteca de testes, áudio remoto, `expo-av`, permissão ou plugin nativo.
+
+## Limpeza técnica de 2026-08-01
+
+- Rotas duplicadas, randomizador substituído, adapters/reexports sem consumidor, barrels órfãos, símbolos não usados e `assets/splash-icon.png` foram removidos.
+- `FlagVisual` possui um único caminho canônico; a API pública do núcleo dos quizzes expõe somente o que as duas features consomem.
+- Quizzes compartilham sons e reposicionamento do scroll por `useFlagQuizScreenEffects`, mantendo navegação e apresentação específicas em cada tela.
+- Memória deriva cartas de `pairCount`, e os jogos compartilham Fisher–Yates, `RandomSource` e normalização de nomes.
+- Os geradores de áudio compartilham `scripts/wav-utils.mjs`; o gerador de bandeiras recusa fonte sem o cabeçalho Unicode Emoji 17.0 exato.
+- ESLint 9 usa `eslint.config.js`; TypeScript, lint e Prettier possuem scripts reproduzíveis no `package.json`.
+- `expo-linking`, `expo-status-bar`, `react-native-svg` e as declarações diretas redundantes de `expo-asset`/`expo-constants` saíram do manifesto. Ferramentas de build/lint foram movidas para `devDependencies`; peers de navegação e Reanimated foram preservados.
+- TypeScript estrito, `--noUnusedLocals`, lint sem warnings, Prettier, `npm ls`, `expo install --check` offline e bundles Android/iOS passaram.
+- `expo-doctor@latest` e `npm audit --omit=dev` não concluíram porque o ambiente bloqueou acesso ao registro npm; não houve correção automática de vulnerabilidades.
 
 ## Validações anteriores da sessão de 2026-08-01
 
@@ -361,8 +381,7 @@ Não foi possível percorrer o fluxo inteiro por toques no simulador: não havia
 - Os quizzes ainda não possuem cronômetro, persistência de score ou ranking.
 - A terceira modalidade passou nas validações automatizadas, bundles e fluxo completo no emulador Android; falta repetir a checagem em aparelho físico e percorrer sua UI no iOS.
 - A memória passou nas validações determinísticas e nos fluxos parciais Fácil/Difícil do emulador Android; ainda falta uma partida completa e avaliação de áudio/acessibilidade em hardware real.
-- O randomizador legado do primeiro jogo ainda usa `sort` aleatório; os quizzes usam Fisher–Yates.
-- `src/app/routes/` é legado e não utilizado. Evite importar dele.
+- Web, identidade final do aplicativo (`name`, `slug`, package/applicationId e ícones) e estratégia de orientação em runtime não foram alterados nesta limpeza; essas decisões continuam exigindo direção de produto.
 
 ## Regras para próximas sessões
 
@@ -377,8 +396,10 @@ Não foi possível percorrer o fluxo inteiro por toques no simulador: não havia
 
 ```bash
 npm install
-npx tsc --noEmit
-ESLINT_USE_FLAT_CONFIG=false npx eslint "src/**/*.{ts,tsx}" "scripts/*.mjs"
+npm run typecheck
+npm run lint
+npm run format:check
+npx expo install --check
 npx expo-doctor@latest
 npx expo start --clear
 node scripts/generate-welcome-theme.mjs
@@ -392,4 +413,4 @@ node scripts/download-flag-assets.mjs
 2. Confirmar volume dos efeitos — inclusive um toque por par na memória —, redução de movimento, VoiceOver e TalkBack em Android/iOS físicos.
 3. Coletar feedback de jogadores brasileiros e revisar a curadoria editorial quando houver evidência.
 4. Considerar persistência de melhor pontuação por dificuldade sem acoplar storage à tela.
-5. Remover a definição legada `src/app/routes/` em uma limpeza dedicada, após confirmar que nenhum consumidor externo depende dela.
+5. Decidir explicitamente se web será suportada e fechar nome, identificadores e ícones de distribuição antes de publicar builds de loja.

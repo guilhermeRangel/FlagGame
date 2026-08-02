@@ -5,6 +5,7 @@ import { ScreenContainer } from '@/shared/components/ScreenContainer';
 import { Header } from '@/shared/components/Header';
 import { AppButton } from '@/shared/components/AppButton';
 import { InteractiveFlagCard } from '@/features/flag-game/components/InteractiveFlagCard';
+import { MAX_FLAG_ROTATIONS } from '@/features/flag-game/constants';
 import {
   FLAG_OPTIONS,
   getRandomFlags,
@@ -30,7 +31,7 @@ export function FlagGameScreen() {
     setSpeeds((current) => {
       const currentSpeed = current[flagId] ?? 0;
 
-      if (currentSpeed === 4) {
+      if (currentSpeed === MAX_FLAG_ROTATIONS) {
         return current;
       }
 
@@ -52,7 +53,9 @@ export function FlagGameScreen() {
   };
 
   const summary = useMemo(() => {
-    const unavailableCount = Object.values(speeds).filter((speed) => speed === 4).length;
+    const unavailableCount = Object.values(speeds).filter(
+      (speed) => speed === MAX_FLAG_ROTATIONS,
+    ).length;
 
     if (unavailableCount === 0) {
       return 'Nenhuma bandeira esgotada';
@@ -65,7 +68,8 @@ export function FlagGameScreen() {
     <ScreenContainer style={styles.container}>
       <Header title="Bandeiras Giratórias" onBack={() => navigation.goBack()} />
       <Text style={styles.instructions}>
-        Toque para girar. Cada bandeira pode ser usada quatro vezes antes de ficar indisponível.
+        Toque para girar. Cada bandeira pode ser usada {MAX_FLAG_ROTATIONS} vezes antes de ficar
+        indisponível.
       </Text>
       <Text style={styles.summary}>{summary}</Text>
       <View style={styles.actions}>

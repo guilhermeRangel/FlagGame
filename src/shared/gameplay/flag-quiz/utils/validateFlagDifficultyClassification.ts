@@ -5,7 +5,7 @@ import {
 } from '@/shared/gameplay/flag-quiz/data/flag-difficulty.data';
 import type { Flag } from '@/shared/domain/flags';
 
-export type FlagDifficultyClassificationValidation = {
+type FlagDifficultyClassificationValidation = {
   readonly isValid: boolean;
   readonly expectedCount: number;
   readonly catalogCount: number;
@@ -31,7 +31,7 @@ function findDuplicateIds(ids: readonly string[]): string[] {
   return [...duplicateIds].sort();
 }
 
-export function validateFlagDifficultyClassification(
+function validateFlagDifficultyClassification(
   flags: readonly Pick<Flag, 'id'>[],
 ): FlagDifficultyClassificationValidation {
   const catalogIds = flags.map(({ id }) => id);

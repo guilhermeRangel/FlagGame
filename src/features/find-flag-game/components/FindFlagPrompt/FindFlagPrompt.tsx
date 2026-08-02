@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
 
-export type FindFlagPromptTone = 'neutral' | 'correct' | 'incorrect';
+type FindFlagPromptTone = 'neutral' | 'correct' | 'incorrect';
 
 type FindFlagPromptProps = {
   readonly countryName: string;

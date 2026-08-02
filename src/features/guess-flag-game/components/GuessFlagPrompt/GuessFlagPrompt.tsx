@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { FlagVisual } from '@/shared/gameplay/flag-quiz';
+import { FlagVisual } from '@/shared/components/FlagVisual';
 import { borderRadius, colors, fontSizes, spacing } from '@/shared/theme';
 import type { FlagVisual as FlagVisualValue } from '@/shared/domain/flags';
 

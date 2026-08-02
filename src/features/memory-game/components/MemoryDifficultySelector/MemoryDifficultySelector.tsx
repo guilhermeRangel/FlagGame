@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
+  getMemoryGameCardCount,
   MEMORY_GAME_DIFFICULTIES,
   MEMORY_GAME_DIFFICULTY_CONFIG,
 } from '@/features/memory-game/constants/memoryGame.constants';
@@ -27,12 +28,13 @@ export function MemoryDifficultySelector({
       <View style={styles.options}>
         {MEMORY_GAME_DIFFICULTIES.map((difficulty) => {
           const config = MEMORY_GAME_DIFFICULTY_CONFIG[difficulty];
+          const cardCount = getMemoryGameCardCount(difficulty);
           const isSelected = difficulty === selectedDifficulty;
 
           return (
             <Pressable
               accessibilityRole="radio"
-              accessibilityLabel={`${config.label}. ${config.cardCount} cartas, ${config.pairCount} pares.`}
+              accessibilityLabel={`${config.label}. ${cardCount} cartas, ${config.pairCount} pares.`}
               accessibilityState={{ checked: isSelected, disabled }}
               disabled={disabled}
               key={difficulty}
@@ -47,7 +49,7 @@ export function MemoryDifficultySelector({
               <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
                 {config.label}
               </Text>
-              <Text style={styles.cardCount}>{config.cardCount}</Text>
+              <Text style={styles.cardCount}>{cardCount}</Text>
               <Text style={styles.cardCaption}>cartas</Text>
             </Pressable>
           );

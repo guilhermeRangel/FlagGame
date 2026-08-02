@@ -1,8 +1,8 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
+
+import { createPcm16MonoWav, writeWavFile } from './wav-utils.mjs';
 
 const sampleRate = 22_050;
-const bytesPerSample = 2;
 
 function noteEnvelope(progress) {
   const attack = Math.min(1, progress / 0.08);
@@ -25,33 +25,6 @@ function createSequenceSampler(frequencies, durationSeconds, volume) {
   };
 }
 
-function createWav(durationSeconds, sampleAt) {
-  const sampleCount = Math.floor(sampleRate * durationSeconds);
-  const dataSize = sampleCount * bytesPerSample;
-  const wav = Buffer.alloc(44 + dataSize);
-
-  wav.write('RIFF', 0);
-  wav.writeUInt32LE(36 + dataSize, 4);
-  wav.write('WAVE', 8);
-  wav.write('fmt ', 12);
-  wav.writeUInt32LE(16, 16);
-  wav.writeUInt16LE(1, 20);
-  wav.writeUInt16LE(1, 22);
-  wav.writeUInt32LE(sampleRate, 24);
-  wav.writeUInt32LE(sampleRate * bytesPerSample, 28);
-  wav.writeUInt16LE(bytesPerSample, 32);
-  wav.writeUInt16LE(bytesPerSample * 8, 34);
-  wav.write('data', 36);
-  wav.writeUInt32LE(dataSize, 40);
-
-  for (let index = 0; index < sampleCount; index += 1) {
-    const sample = Math.max(-1, Math.min(1, sampleAt(index / sampleRate)));
-    wav.writeInt16LE(Math.round(sample * 32_767), 44 + index * bytesPerSample);
-  }
-
-  return wav;
-}
-
 const effects = [
   {
     filename: 'correct-answer.wav',
@@ -72,7 +45,11 @@ const effects = [
 
 for (const effect of effects) {
   const outputPath = resolve('src/shared/assets/audio/game-effects', effect.filename);
-  mkdirSync(dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, createWav(effect.duration, effect.sampleAt));
+  const wav = createPcm16MonoWav({
+    durationSeconds: effect.duration,
+    sampleAt: effect.sampleAt,
+    sampleRate,
+  });
+  writeWavFile(outputPath, wav);
   console.log(`Efeito criado em ${outputPath} (${effect.duration}s).`);
 }
