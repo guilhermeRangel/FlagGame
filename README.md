@@ -49,7 +49,11 @@ A primeira carta permanece aberta até a segunda escolha. Um par correto fica re
 
 ## DEMO
 
-https://github.com/user-attachments/assets/c29939c2-64c9-4300-ac6b-ac4f62b13f5e
+
+
+https://github.com/user-attachments/assets/17f5b02b-00c1-46eb-8255-11a219f33a43
+
+
 
 ## Requisitos
 
